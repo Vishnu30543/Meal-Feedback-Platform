@@ -1,0 +1,240 @@
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import api from '../../api/axios';
+import { Star, ChevronLeft, CheckCircle, Send } from 'lucide-react';
+import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function TodayMenu() {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [activeDishIndex, setActiveDishIndex] = useState(0);
+  const [ratings, setRatings] = useState<Record<number, { rating: number, comment: string }>>({});
+  
+  // Overall Lunch Rating State
+  const [overallRating, setOverallRating] = useState<number>(0);
+  const [overallComment, setOverallComment] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
+  const { data: menu, isLoading } = useQuery({
+    queryKey: ['menu', todayStr],
+    queryFn: () => api.get(`/menus/date/${todayStr}`).then(res => res.data)
+  });
+
+  const dishes = menu?.dishes?.map((md: any) => md.dish) || [];
+
+  const handleRatingChange = (dishId: number, rating: number) => {
+    setRatings(prev => ({
+      ...prev,
+      [dishId]: { ...prev[dishId], rating, comment: prev[dishId]?.comment || '' }
+    }));
+  };
+
+  const handleCommentChange = (dishId: number, comment: string) => {
+    setRatings(prev => ({
+      ...prev,
+      [dishId]: { ...prev[dishId], rating: prev[dishId]?.rating || 0, comment }
+    }));
+  };
+
+  const submitRatings = async () => {
+    setIsSubmitting(true);
+    try {
+      // 1. Submit individual dish ratings
+      for (const [dishIdStr, data] of Object.entries(ratings)) {
+        if (data.rating > 0) {
+          await api.post(`/ratings/dish/${menu.id}/${dishIdStr}`, data);
+        }
+      }
+      
+      // 2. Submit overall rating if provided
+      if (overallRating > 0) {
+        await api.post(`/ratings/overall/${menu.id}`, {
+          rating: overallRating,
+          comment: overallComment
+        });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ['ratingProgress'] });
+      alert('Thank you for your valuable feedback!');
+      navigate('/resident');
+    } catch {
+      alert('Failed to submit ratings. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isLoading) return <div className="text-center py-10">Loading Menu...</div>;
+  if (!menu || dishes.length === 0) return (
+    <div className="card p-8 text-center mt-6">
+      <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">No Menu Today</h2>
+      <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2">The menu for today hasn't been published yet.</p>
+    </div>
+  );
+
+  const isLastDish = activeDishIndex === dishes.length - 1;
+  const isOverallStep = activeDishIndex === dishes.length;
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center">
+        <button onClick={() => navigate('/resident')} className="p-2 mr-2 text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:bg-slate-800 rounded-full">
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">Rate Today's Lunch</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{format(new Date(), 'EEEE, MMMM do')}</p>
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center px-2">
+        <div className="flex gap-1">
+          {Array.from({ length: dishes.length + 1 }).map((_, idx) => (
+            <div 
+              key={idx} 
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                idx === activeDishIndex ? 'w-6 bg-primary-600' : 
+                idx < activeDishIndex ? 'w-3 bg-primary-300' : 'w-3 bg-slate-200'
+              }`} 
+            />
+          ))}
+        </div>
+        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
+          {isOverallStep ? 'Final Step' : `Item ${activeDishIndex + 1} of ${dishes.length}`}
+        </span>
+      </div>
+
+      <div className="relative overflow-hidden min-h-[400px]">
+        <AnimatePresence mode="wait">
+          {!isOverallStep ? (
+            <motion.div
+              key={activeDishIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="card overflow-hidden"
+            >
+              {dishes[activeDishIndex].imageUrl && (
+                <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative">
+                  <img 
+                    src={dishes[activeDishIndex].imageUrl} 
+                    alt={dishes[activeDishIndex].name}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-3 left-3 bg-white dark:bg-slate-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm">
+                    {dishes[activeDishIndex].category}
+                  </div>
+                </div>
+              )}
+              
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">{dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}</h2>
+                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mb-6 line-clamp-2">{dishes[activeDishIndex].description}</p>
+
+                <div className="flex flex-col items-center justify-center py-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl mb-6">
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">How did you like this dish?</p>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button
+                        key={star}
+                        onClick={() => handleRatingChange(dishes[activeDishIndex].id, star)}
+                        className={`p-2 transition-transform hover:scale-110 ${
+                          (ratings[dishes[activeDishIndex].id]?.rating || 0) >= star 
+                            ? 'text-amber-400' 
+                            : 'text-slate-200'
+                        }`}
+                      >
+                        <Star className="w-10 h-10 fill-current" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Any comments? (Optional)</label>
+                  <textarea 
+                    className="input-field min-h-[80px] resize-none"
+                    placeholder="E.g., A bit too spicy, perfect consistency..."
+                    value={ratings[dishes[activeDishIndex].id]?.comment || ''}
+                    onChange={(e) => handleCommentChange(dishes[activeDishIndex].id, e.target.value)}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="overall"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+              className="card p-8 text-center"
+            >
+              <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="w-8 h-8 text-primary-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Overall Experience</h2>
+              <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-8 max-w-sm mx-auto">
+                How would you rate today's lunch as a whole? Your feedback helps us improve the daily menu combination.
+              </p>
+
+              <div className="flex gap-2 justify-center mb-8">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <button
+                    key={star}
+                    onClick={() => setOverallRating(star)}
+                    className={`p-2 transition-transform hover:scale-110 ${
+                      overallRating >= star ? 'text-amber-400' : 'text-slate-200'
+                    }`}
+                  >
+                    <Star className="w-12 h-12 fill-current" />
+                  </button>
+                ))}
+              </div>
+
+              <textarea 
+                className="input-field min-h-[100px] resize-none mb-6 text-left"
+                placeholder="Overall comments about today's meal..."
+                value={overallComment}
+                onChange={(e) => setOverallComment(e.target.value)}
+              />
+
+              <button 
+                onClick={submitRatings}
+                disabled={isSubmitting}
+                className="btn-primary w-full py-4 text-lg font-bold flex justify-center items-center"
+              >
+                {isSubmitting ? 'Submitting...' : (
+                  <>Submit All Feedback <Send className="w-5 h-5 ml-2" /></>
+                )}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {!isOverallStep && (
+        <div className="flex justify-between gap-4 mt-6">
+          <button 
+            onClick={() => setActiveDishIndex(p => Math.max(0, p - 1))}
+            disabled={activeDishIndex === 0}
+            className="btn-secondary flex-1 py-3"
+          >
+            Previous
+          </button>
+          <button 
+            onClick={() => setActiveDishIndex(p => p + 1)}
+            className="btn-primary flex-1 py-3"
+          >
+            {isLastDish ? 'Continue to Overall' : 'Next Dish'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,81 @@
+import { Outlet, Link, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import ThemeToggle from '../components/ThemeToggle';
+import { LayoutDashboard, LogOut, FileText, Bell, Users, Settings, Utensils } from 'lucide-react';
+
+export default function AdminLayout() {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+
+  const navItems = [
+    { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
+    { name: 'Menus', path: '/admin/menus', icon: FileText },
+    { name: 'Dishes', path: '/admin/dishes', icon: Utensils },
+    { name: 'Sadhakas', path: '/admin/residents', icon: Users },
+    { name: 'Content', path: '/admin/announcements', icon: Bell },
+    { name: 'Settings', path: '/admin/settings', icon: Settings },
+  ];
+
+  return (
+    <div className="min-h-screen bg-background dark:bg-slate-900 transition-colors duration-300 flex">
+      {/* Sidebar */}
+      <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-colors duration-300">
+        <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
+          <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500">Ashram Admin</h1>
+        </div>
+        
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+            return (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
+                  isActive 
+                    ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400' 
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <Icon className={`w-5 h-5 mr-3 ${isActive ? 'text-primary-600' : 'text-slate-400 dark:text-slate-500'}`} />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+        
+        <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <div>
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{user?.name}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">Administrator</p>
+            </div>
+          </div>
+          <button
+            onClick={logout}
+            className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:text-red-400 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl transition-colors"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-8 justify-between shadow-sm z-10 transition-colors duration-300">
+          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+            {navItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))?.name || 'Dashboard'}
+          </h2>
+          <ThemeToggle />
+        </header>
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
