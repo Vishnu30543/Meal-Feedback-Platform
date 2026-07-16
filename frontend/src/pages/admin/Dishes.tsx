@@ -87,7 +87,7 @@ export default function Dishes() {
                 </tr>
               ) : (
                 data?.content?.map((dish: any) => (
-                  <tr key={dish.id} className="hover:bg-slate-50 dark:bg-slate-900/50/50 transition-colors">
+                  <tr key={dish.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden mr-3 shrink-0">

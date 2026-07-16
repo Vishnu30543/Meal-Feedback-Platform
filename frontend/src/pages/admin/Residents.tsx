@@ -70,7 +70,7 @@ export default function Residents() {
                 </tr>
               ) : (
                 data?.content?.map((resident: any) => (
-                  <tr key={resident.id} className="hover:bg-slate-50 dark:bg-slate-900/50/50 transition-colors">
+                  <tr key={resident.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-50">{resident.residentCode}</td>
                     <td className="px-6 py-4">{resident.name}</td>
                     <td className="px-6 py-4">{resident.phone}</td>

@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
-import { LayoutDashboard, LogOut, FileText, Bell, Users, Settings, Utensils } from 'lucide-react';
+import { LayoutDashboard, LogOut, FileText, Bell, Users, Settings, Utensils, Menu, X } from 'lucide-react';
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
@@ -18,10 +20,24 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 transition-colors duration-300 flex">
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/50 z-20 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <div className="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-colors duration-300">
-        <div className="h-16 flex items-center px-6 border-b border-slate-100 dark:border-slate-800">
+      <div className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
           <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500">Ashram Admin</h1>
+          <button 
+            className="md:hidden p-2 -mr-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
         
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -32,6 +48,7 @@ export default function AdminLayout() {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
                   isActive 
                     ? 'bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400' 
@@ -63,11 +80,19 @@ export default function AdminLayout() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-8 justify-between shadow-sm z-10 transition-colors duration-300">
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-            {navItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))?.name || 'Dashboard'}
-          </h2>
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <header className="h-16 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center px-4 md:px-8 justify-between shadow-sm z-10 transition-colors duration-300">
+          <div className="flex items-center">
+            <button 
+              className="md:hidden mr-3 p-2 -ml-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+              {navItems.find(i => location.pathname === i.path || location.pathname.startsWith(i.path + '/'))?.name || 'Dashboard'}
+            </h2>
+          </div>
           <ThemeToggle />
         </header>
         <main className="flex-1 overflow-y-auto p-8">

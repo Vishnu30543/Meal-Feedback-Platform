@@ -76,7 +76,7 @@ export default function Menus() {
         {/* Menu Editor Side */}
         <div className="lg:col-span-2">
           <div className="card h-full min-h-[500px]">
-            <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50/50">
+            <div className="p-4 sm:p-6 border-b border-slate-100 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 dark:bg-slate-800/50">
               <div>
                 <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                   Menu for {format(selectedDate, 'EEEE, MMM d, yyyy')}
@@ -87,7 +87,7 @@ export default function Menus() {
                   </span>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
                 <button className="btn-secondary">Copy Previous</button>
                 <button className="btn-primary">
                   {menu ? 'Update Menu' : 'Create Menu'}

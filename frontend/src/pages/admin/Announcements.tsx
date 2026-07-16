@@ -58,8 +58,8 @@ export default function Announcements() {
         </div>
 
         {/* Content */}
-        <div className="p-0">
-          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+        <div className="p-0 overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300 min-w-max">
             <thead className="bg-slate-50 dark:bg-slate-900/50 text-slate-700 dark:text-slate-200 border-b border-slate-100 dark:border-slate-700">
               <tr>
                 <th className="px-6 py-4 font-semibold">Title</th>
@@ -74,7 +74,7 @@ export default function Announcements() {
             </thead>
             <tbody className="divide-y divide-slate-100">
               {activeTab === 'announcements' && announcements?.content?.map((item: any) => (
-                <tr key={item.id} className="hover:bg-slate-50 dark:bg-slate-900/50/50">
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-50">{item.title}</td>
                   <td className="px-6 py-4">
                     {format(new Date(item.startDate), 'MMM d, yyyy')} - {format(new Date(item.endDate), 'MMM d, yyyy')}
@@ -93,7 +93,7 @@ export default function Announcements() {
               ))}
 
               {activeTab === 'healthTips' && healthTips?.content?.map((item: any) => (
-                <tr key={item.id} className="hover:bg-slate-50 dark:bg-slate-900/50/50">
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   <td className="px-6 py-4 font-medium text-slate-900 dark:text-slate-50">{item.title}</td>
                   <td className="px-6 py-4">
                     {item.activeDate ? format(new Date(item.activeDate), 'MMM d, yyyy') : 'No Date Set'}
