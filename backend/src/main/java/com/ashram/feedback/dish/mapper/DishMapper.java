@@ -41,6 +41,7 @@ public interface DishMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
     Dish toEntity(CreateDishRequest request);
 
     @Mapping(target = "id", ignore = true)
@@ -65,5 +66,6 @@ public interface DishMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "averageRating", ignore = true)
     void updateDishFromRequest(UpdateDishRequest request, @MappingTarget Dish dish);
 }

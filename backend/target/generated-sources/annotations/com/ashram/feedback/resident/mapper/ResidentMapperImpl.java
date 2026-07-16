@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-16T18:14:29+0530",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
+    date = "2026-07-16T21:02:12+0530",
+    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
 )
 @Component
 public class ResidentMapperImpl implements ResidentMapper {
@@ -27,11 +27,11 @@ public class ResidentMapperImpl implements ResidentMapper {
         ResidentDto.ResidentDtoBuilder residentDto = ResidentDto.builder();
 
         residentDto.camps( toCampDtos( resident.getCamps() ) );
+        residentDto.createdAt( resident.getCreatedAt() );
         residentDto.id( resident.getId() );
-        residentDto.residentCode( resident.getResidentCode() );
         residentDto.name( resident.getName() );
         residentDto.phone( resident.getPhone() );
-        residentDto.createdAt( resident.getCreatedAt() );
+        residentDto.residentCode( resident.getResidentCode() );
         residentDto.updatedAt( resident.getUpdatedAt() );
 
         residentDto.activeCamp( toCampDto(resident.getActiveCamp()) );
@@ -47,12 +47,12 @@ public class ResidentMapperImpl implements ResidentMapper {
 
         CampDto.CampDtoBuilder campDto = CampDto.builder();
 
-        campDto.id( camp.getId() );
-        campDto.startDate( camp.getStartDate() );
-        campDto.endDate( camp.getEndDate() );
-        campDto.duration( camp.getDuration() );
         campDto.active( camp.isActive() );
         campDto.createdAt( camp.getCreatedAt() );
+        campDto.duration( camp.getDuration() );
+        campDto.endDate( camp.getEndDate() );
+        campDto.id( camp.getId() );
+        campDto.startDate( camp.getStartDate() );
 
         return campDto.build();
     }
@@ -79,9 +79,9 @@ public class ResidentMapperImpl implements ResidentMapper {
 
         Resident.ResidentBuilder resident = Resident.builder();
 
-        resident.residentCode( request.getResidentCode() );
         resident.name( request.getName() );
         resident.phone( request.getPhone() );
+        resident.residentCode( request.getResidentCode() );
 
         return resident.build();
     }

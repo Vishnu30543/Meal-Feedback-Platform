@@ -1,10 +1,56 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ChevronLeft, Save } from 'lucide-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api from '../../api/axios';
 
 export default function DishForm() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState(1);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    displayName: '',
+    description: '',
+    category: 'CURRY'
+  });
+
+  const { data: existingDish, isLoading } = useQuery({
+    queryKey: ['dish', id],
+    queryFn: () => api.get(`/dishes/${id}`).then(res => res.data),
+    enabled: !!id
+  });
+
+  useEffect(() => {
+    if (existingDish) {
+      setFormData({
+        name: existingDish.name || '',
+        displayName: existingDish.displayName || '',
+        description: existingDish.description || '',
+        category: existingDish.category || 'CURRY'
+      });
+    }
+  }, [existingDish]);
+
+  const mutation = useMutation({
+    mutationFn: (data: typeof formData) => id ? api.put(`/dishes/${id}`, data) : api.post('/dishes', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+      navigate('/admin/dishes');
+    },
+  });
+
+  if (isLoading) return <div className="p-10 text-center">Loading dish data...</div>;
+
+  const handleSave = () => {
+    if (!formData.name) {
+      alert("Internal Name is required");
+      return;
+    }
+    mutation.mutate(formData);
+  };
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -13,8 +59,8 @@ export default function DishForm() {
           <ChevronLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Add New Dish</h1>
-          <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Create a new recipe in the system</p>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{id ? 'Edit Dish' : 'Add New Dish'}</h1>
+          <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">{id ? 'Update recipe details' : 'Create a new recipe in the system'}</p>
         </div>
       </div>
 
@@ -41,16 +87,49 @@ export default function DishForm() {
             <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Basic Information</h3>
             <div className="grid grid-cols-2 gap-5">
               <div className="col-span-2 sm:col-span-1">
-                <label className="label-text">Dish Name (Internal)</label>
-                <input type="text" className="input-field" placeholder="e.g. bottle-gourd-curry" />
+                <label className="label-text">Dish Name (Internal) <span className="text-red-500">*</span></label>
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="e.g. bottle-gourd-curry"
+                  value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                />
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="label-text">Display Name</label>
-                <input type="text" className="input-field" placeholder="e.g. Bottle Gourd Curry" />
+                <input 
+                  type="text" 
+                  className="input-field" 
+                  placeholder="e.g. Bottle Gourd Curry"
+                  value={formData.displayName}
+                  onChange={(e) => setFormData({...formData, displayName: e.target.value})}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="label-text">Category</label>
+                <select 
+                  className="input-field"
+                  value={formData.category}
+                  onChange={(e) => setFormData({...formData, category: e.target.value})}
+                >
+                  <option value="CURRY">Curry</option>
+                  <option value="RICE">Rice</option>
+                  <option value="ROTI">Roti</option>
+                  <option value="SALAD">Salad</option>
+                  <option value="SOUP">Soup</option>
+                  <option value="JUICE">Juice</option>
+                  <option value="SWEET">Sweet</option>
+                </select>
               </div>
               <div className="col-span-2">
                 <label className="label-text">Description</label>
-                <textarea className="input-field min-h-[100px]" placeholder="Detailed description of the dish..." />
+                <textarea 
+                  className="input-field min-h-[100px]" 
+                  placeholder="Detailed description of the dish..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                />
               </div>
             </div>
           </div>
@@ -59,6 +138,12 @@ export default function DishForm() {
         {step > 1 && (
           <div className="flex-1 flex items-center justify-center text-slate-500 dark:text-slate-400 dark:text-slate-500 animate-in fade-in">
             Form step {step} placeholder for {step === 2 ? 'Recipe' : step === 3 ? 'Nutrition' : 'Images'}
+          </div>
+        )}
+
+        {mutation.isError && (
+          <div className="text-red-500 text-sm p-4 mt-4 bg-red-50 dark:bg-red-900/20 rounded">
+            Failed to save dish. {mutation.error?.message}
           </div>
         )}
 
@@ -71,18 +156,27 @@ export default function DishForm() {
             Previous
           </button>
           
-          {step < 4 ? (
+          <div className="flex gap-2">
             <button 
-              onClick={() => setStep(s => Math.min(4, s + 1))}
-              className="btn-primary"
+              onClick={handleSave}
+              disabled={mutation.isPending}
+              className="btn-secondary text-primary-600 border-primary-600 hover:bg-primary-50"
             >
-              Next Step
+              {mutation.isPending ? 'Saving...' : 'Save & Exit'}
             </button>
-          ) : (
-            <button className="btn-primary flex items-center">
-              <Save className="w-4 h-4 mr-2" /> Save Dish
-            </button>
-          )}
+            {step < 4 ? (
+              <button 
+                onClick={() => setStep(s => Math.min(4, s + 1))}
+                className="btn-primary"
+              >
+                Next Step
+              </button>
+            ) : (
+              <button onClick={handleSave} disabled={mutation.isPending} className="btn-primary flex items-center">
+                <Save className="w-4 h-4 mr-2" /> Save Dish
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

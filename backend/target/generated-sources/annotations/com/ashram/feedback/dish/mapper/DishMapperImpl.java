@@ -20,8 +20,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-16T18:14:29+0530",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 21.0.4 (Oracle Corporation)"
+    date = "2026-07-16T21:02:12+0530",
+    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.46.100.v20260624-0231, environment: Java 21.0.11 (Eclipse Adoptium)"
 )
 @Component
 public class DishMapperImpl implements DishMapper {
@@ -38,19 +38,20 @@ public class DishMapperImpl implements DishMapper {
         dishDto.recipe( toRecipeDto( dish.getRecipe() ) );
         dishDto.nutrition( toNutritionDto( dish.getNutrition() ) );
         dishDto.allergen( toAllergenDto( dish.getAllergen() ) );
+        dishDto.averageRating( dish.getAverageRating() );
+        dishDto.category( dish.getCategory() );
+        dishDto.createdAt( dish.getCreatedAt() );
+        dishDto.description( dish.getDescription() );
+        dishDto.difficulty( dish.getDifficulty() );
+        dishDto.displayName( dish.getDisplayName() );
+        dishDto.healthBenefits( dish.getHealthBenefits() );
         dishDto.id( dish.getId() );
         dishDto.name( dish.getName() );
-        dishDto.displayName( dish.getDisplayName() );
-        dishDto.slug( dish.getSlug() );
-        dishDto.category( dish.getCategory() );
-        dishDto.description( dish.getDescription() );
         dishDto.preparationTime( dish.getPreparationTime() );
-        dishDto.difficulty( dish.getDifficulty() );
-        dishDto.healthBenefits( dish.getHealthBenefits() );
-        dishDto.youtubeUrl( dish.getYoutubeUrl() );
+        dishDto.slug( dish.getSlug() );
         dishDto.status( dish.getStatus() );
-        dishDto.createdAt( dish.getCreatedAt() );
         dishDto.updatedAt( dish.getUpdatedAt() );
+        dishDto.youtubeUrl( dish.getYoutubeUrl() );
 
         return dishDto.build();
     }
@@ -63,12 +64,13 @@ public class DishMapperImpl implements DishMapper {
 
         DishSummaryDto.DishSummaryDtoBuilder dishSummaryDto = DishSummaryDto.builder();
 
+        dishSummaryDto.averageRating( dish.getAverageRating() );
+        dishSummaryDto.category( dish.getCategory() );
+        dishSummaryDto.displayName( dish.getDisplayName() );
         dishSummaryDto.id( dish.getId() );
         dishSummaryDto.name( dish.getName() );
-        dishSummaryDto.displayName( dish.getDisplayName() );
-        dishSummaryDto.slug( dish.getSlug() );
-        dishSummaryDto.category( dish.getCategory() );
         dishSummaryDto.preparationTime( dish.getPreparationTime() );
+        dishSummaryDto.slug( dish.getSlug() );
         dishSummaryDto.status( dish.getStatus() );
 
         dishSummaryDto.primaryImageUrl( dish.getPrimaryImageUrl() );
@@ -86,9 +88,9 @@ public class DishMapperImpl implements DishMapper {
 
         DishImageDto.DishImageDtoBuilder dishImageDto = DishImageDto.builder();
 
+        dishImageDto.displayOrder( image.getDisplayOrder() );
         dishImageDto.id( image.getId() );
         dishImageDto.imageUrl( image.getImageUrl() );
-        dishImageDto.displayOrder( image.getDisplayOrder() );
 
         return dishImageDto.build();
     }
@@ -115,11 +117,11 @@ public class DishMapperImpl implements DishMapper {
 
         RecipeDto.RecipeDtoBuilder recipeDto = RecipeDto.builder();
 
+        recipeDto.healthBenefits( recipe.getHealthBenefits() );
         recipeDto.id( recipe.getId() );
         recipeDto.ingredients( recipe.getIngredients() );
-        recipeDto.preparationSteps( recipe.getPreparationSteps() );
         recipeDto.preparationNotes( recipe.getPreparationNotes() );
-        recipeDto.healthBenefits( recipe.getHealthBenefits() );
+        recipeDto.preparationSteps( recipe.getPreparationSteps() );
         recipeDto.youtubeUrl( recipe.getYoutubeUrl() );
 
         return recipeDto.build();
@@ -133,12 +135,12 @@ public class DishMapperImpl implements DishMapper {
 
         NutritionDto.NutritionDtoBuilder nutritionDto = NutritionDto.builder();
 
-        nutritionDto.id( nutrition.getId() );
-        nutritionDto.energy( nutrition.getEnergy() );
         nutritionDto.carbohydrates( nutrition.getCarbohydrates() );
-        nutritionDto.protein( nutrition.getProtein() );
+        nutritionDto.energy( nutrition.getEnergy() );
         nutritionDto.fat( nutrition.getFat() );
         nutritionDto.fiber( nutrition.getFiber() );
+        nutritionDto.id( nutrition.getId() );
+        nutritionDto.protein( nutrition.getProtein() );
 
         return nutritionDto.build();
     }
@@ -151,16 +153,16 @@ public class DishMapperImpl implements DishMapper {
 
         AllergenDto.AllergenDtoBuilder allergenDto = AllergenDto.builder();
 
+        allergenDto.celery( allergen.isCelery() );
+        allergenDto.gluten( allergen.isGluten() );
         allergenDto.id( allergen.getId() );
         allergenDto.milk( allergen.isMilk() );
-        allergenDto.gluten( allergen.isGluten() );
-        allergenDto.peanut( allergen.isPeanut() );
-        allergenDto.soy( allergen.isSoy() );
-        allergenDto.sesame( allergen.isSesame() );
-        allergenDto.treeNuts( allergen.isTreeNuts() );
         allergenDto.mustard( allergen.isMustard() );
-        allergenDto.celery( allergen.isCelery() );
+        allergenDto.peanut( allergen.isPeanut() );
+        allergenDto.sesame( allergen.isSesame() );
+        allergenDto.soy( allergen.isSoy() );
         allergenDto.sulphites( allergen.isSulphites() );
+        allergenDto.treeNuts( allergen.isTreeNuts() );
 
         return allergenDto.build();
     }
@@ -173,13 +175,13 @@ public class DishMapperImpl implements DishMapper {
 
         Dish.DishBuilder dish = Dish.builder();
 
-        dish.name( request.getName() );
-        dish.displayName( request.getDisplayName() );
         dish.category( request.getCategory() );
         dish.description( request.getDescription() );
-        dish.preparationTime( request.getPreparationTime() );
         dish.difficulty( request.getDifficulty() );
+        dish.displayName( request.getDisplayName() );
         dish.healthBenefits( request.getHealthBenefits() );
+        dish.name( request.getName() );
+        dish.preparationTime( request.getPreparationTime() );
         dish.youtubeUrl( request.getYoutubeUrl() );
 
         return dish.build();
@@ -193,10 +195,10 @@ public class DishMapperImpl implements DishMapper {
 
         Recipe.RecipeBuilder recipe = Recipe.builder();
 
-        recipe.ingredients( dto.getIngredients() );
-        recipe.preparationSteps( dto.getPreparationSteps() );
-        recipe.preparationNotes( dto.getPreparationNotes() );
         recipe.healthBenefits( dto.getHealthBenefits() );
+        recipe.ingredients( dto.getIngredients() );
+        recipe.preparationNotes( dto.getPreparationNotes() );
+        recipe.preparationSteps( dto.getPreparationSteps() );
         recipe.youtubeUrl( dto.getYoutubeUrl() );
 
         return recipe.build();
@@ -210,11 +212,11 @@ public class DishMapperImpl implements DishMapper {
 
         Nutrition.NutritionBuilder nutrition = Nutrition.builder();
 
-        nutrition.energy( dto.getEnergy() );
         nutrition.carbohydrates( dto.getCarbohydrates() );
-        nutrition.protein( dto.getProtein() );
+        nutrition.energy( dto.getEnergy() );
         nutrition.fat( dto.getFat() );
         nutrition.fiber( dto.getFiber() );
+        nutrition.protein( dto.getProtein() );
 
         return nutrition.build();
     }
@@ -227,15 +229,15 @@ public class DishMapperImpl implements DishMapper {
 
         Allergen.AllergenBuilder allergen = Allergen.builder();
 
-        allergen.milk( dto.isMilk() );
-        allergen.gluten( dto.isGluten() );
-        allergen.peanut( dto.isPeanut() );
-        allergen.soy( dto.isSoy() );
-        allergen.sesame( dto.isSesame() );
-        allergen.treeNuts( dto.isTreeNuts() );
-        allergen.mustard( dto.isMustard() );
         allergen.celery( dto.isCelery() );
+        allergen.gluten( dto.isGluten() );
+        allergen.milk( dto.isMilk() );
+        allergen.mustard( dto.isMustard() );
+        allergen.peanut( dto.isPeanut() );
+        allergen.sesame( dto.isSesame() );
+        allergen.soy( dto.isSoy() );
         allergen.sulphites( dto.isSulphites() );
+        allergen.treeNuts( dto.isTreeNuts() );
 
         return allergen.build();
     }
@@ -246,14 +248,14 @@ public class DishMapperImpl implements DishMapper {
             return;
         }
 
-        dish.setName( request.getName() );
-        dish.setDisplayName( request.getDisplayName() );
         dish.setCategory( request.getCategory() );
         dish.setDescription( request.getDescription() );
-        dish.setPreparationTime( request.getPreparationTime() );
         dish.setDifficulty( request.getDifficulty() );
+        dish.setDisplayName( request.getDisplayName() );
         dish.setHealthBenefits( request.getHealthBenefits() );
-        dish.setYoutubeUrl( request.getYoutubeUrl() );
+        dish.setName( request.getName() );
+        dish.setPreparationTime( request.getPreparationTime() );
         dish.setStatus( request.getStatus() );
+        dish.setYoutubeUrl( request.getYoutubeUrl() );
     }
 }

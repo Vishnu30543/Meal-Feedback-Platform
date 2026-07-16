@@ -43,20 +43,26 @@ export default function TodayMenu() {
   const submitRatings = async () => {
     setIsSubmitting(true);
     try {
-      // 1. Submit individual dish ratings
-      for (const [dishIdStr, data] of Object.entries(ratings)) {
-        if (data.rating > 0) {
-          await api.post(`/ratings/dish/${menu.id}/${dishIdStr}`, data);
-        }
-      }
-      
-      // 2. Submit overall rating if provided
+      const dishRatings = Object.entries(ratings)
+        .filter(([_, data]) => data.rating > 0)
+        .map(([dishIdStr, data]) => ({
+          dishId: Number(dishIdStr),
+          rating: data.rating,
+          comment: data.comment || 'No comment provided' // Fallback for @NotBlank
+        }));
+
+      const payload: any = {
+        dishRatings: dishRatings
+      };
+
       if (overallRating > 0) {
-        await api.post(`/ratings/overall/${menu.id}`, {
+        payload.overallRating = {
           rating: overallRating,
-          comment: overallComment
-        });
+          comment: overallComment || 'No comment provided'
+        };
       }
+
+      await api.post(`/ratings/menu/${menu.id}`, payload);
       
       queryClient.invalidateQueries({ queryKey: ['ratingProgress'] });
       alert('Thank you for your valuable feedback!');

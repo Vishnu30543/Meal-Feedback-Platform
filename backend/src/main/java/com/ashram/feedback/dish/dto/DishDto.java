@@ -23,6 +23,7 @@ public class DishDto {
     private String slug;
     private DishCategory category;
     private String description;
+    private Double averageRating;
     private Integer preparationTime;
     private Difficulty difficulty;
     private String healthBenefits;

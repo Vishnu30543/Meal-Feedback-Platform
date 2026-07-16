@@ -19,6 +19,7 @@ public class DishSummaryDto {
     private String slug;
     private DishCategory category;
     private String primaryImageUrl;
+    private Double averageRating;
     private Integer preparationTime;
     private DishStatus status;
     private boolean hasRecipe;

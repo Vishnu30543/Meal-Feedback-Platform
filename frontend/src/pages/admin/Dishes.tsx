@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { Search, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -8,6 +8,20 @@ export default function Dishes() {
   const [page] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const queryClient = useQueryClient();
+
+  const archiveMutation = useMutation({
+    mutationFn: (id: number) => api.patch(`/dishes/${id}/archive`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dishes'] });
+    }
+  });
+
+  const handleArchive = (id: number, name: string) => {
+    if (window.confirm(`Are you sure you want to archive "${name}"?`)) {
+      archiveMutation.mutate(id);
+    }
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ['dishes', page, search, category],
@@ -124,7 +138,11 @@ export default function Dishes() {
                         >
                           <Edit2 className="w-4 h-4" />
                         </Link>
-                        <button className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                        <button 
+                          onClick={() => handleArchive(dish.id, dish.displayName || dish.name)}
+                          disabled={archiveMutation.isPending}
+                          className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

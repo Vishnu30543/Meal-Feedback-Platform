@@ -28,10 +28,11 @@ public class ResidentController {
     @Operation(summary = "Get all residents", description = "Paginated list with search by code/name")
     public ResponseEntity<ApiResponse<PagedResponse<ResidentDto>>> getAllResidents(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false, defaultValue = "false") boolean activeCampOnly,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         return ResponseEntity.ok(ApiResponse.success(
-                residentService.getAllResidents(search, page, size)));
+                residentService.getAllResidents(search, activeCampOnly, page, size)));
     }
 
     @GetMapping("/{id}")
@@ -59,6 +60,14 @@ public class ResidentController {
             @Valid @RequestBody UpdateResidentRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Resident updated successfully",
                 residentService.updateResident(id, request)));
+    }
+
+    @PatchMapping("/{id}/archive")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Archive resident", description = "Toggle archive status for soft-delete")
+    public ResponseEntity<ApiResponse<ResidentDto>> archiveResident(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success("Resident archived successfully",
+                residentService.archiveResident(id)));
     }
 
     // === Camp Management ===

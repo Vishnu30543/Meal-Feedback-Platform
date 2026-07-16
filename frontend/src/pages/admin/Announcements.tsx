@@ -1,11 +1,35 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Megaphone, Heart, Plus, Edit2 } from 'lucide-react';
+import { Megaphone, Heart, Plus, Edit2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import Modal from '../../components/Modal';
+import AnnouncementForm from '../../components/forms/AnnouncementForm';
 
 export default function Announcements() {
   const [activeTab, setActiveTab] = useState<'announcements' | 'healthTips'>('announcements');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/announcements/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      queryClient.invalidateQueries({ queryKey: ['healthTipsAll'] });
+    }
+  });
+
+  const handleDelete = (id: number, title: string) => {
+    if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const handleEdit = (announcement: any) => {
+    setSelectedAnnouncement(announcement);
+    setIsAddModalOpen(true);
+  };
 
   const { data: announcements } = useQuery({
     queryKey: ['announcements'],
@@ -26,7 +50,13 @@ export default function Announcements() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Content Management</h1>
           <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Manage announcements and daily health tips</p>
         </div>
-        <button className="btn-primary flex items-center shrink-0">
+        <button 
+          onClick={() => {
+            setSelectedAnnouncement(null);
+            setIsAddModalOpen(true);
+          }}
+          className="btn-primary flex items-center shrink-0"
+        >
           <Plus className="w-4 h-4 mr-2" /> 
           {activeTab === 'announcements' ? 'New Announcement' : 'New Health Tip'}
         </button>
@@ -87,7 +117,21 @@ export default function Announcements() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600"><Edit2 className="w-4 h-4" /></button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleEdit(item)}
+                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(item.id, item.title)}
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -106,7 +150,21 @@ export default function Announcements() {
                     )}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600"><Edit2 className="w-4 h-4" /></button>
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => handleEdit(item)}
+                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(item.id, item.title)}
+                        disabled={deleteMutation.isPending}
+                        className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -114,6 +172,18 @@ export default function Announcements() {
           </table>
         </div>
       </div>
+
+      <Modal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)}
+        title={selectedAnnouncement ? "Edit Entry" : (activeTab === 'announcements' ? "Create New Announcement" : "Create New Health Tip")}
+      >
+        <AnnouncementForm 
+          initialData={selectedAnnouncement}
+          onSuccess={() => setIsAddModalOpen(false)}
+          onCancel={() => setIsAddModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

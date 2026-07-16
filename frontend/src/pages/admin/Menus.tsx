@@ -1,11 +1,15 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, Plus, Trash2 } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, CheckCircle, Copy, UploadCloud, Edit2 } from 'lucide-react';
 import { format, addDays, startOfWeek } from 'date-fns';
+import Modal from '../../components/Modal';
+import MenuForm from '../../components/forms/MenuForm';
 
 export default function Menus() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const queryClient = useQueryClient();
   
   // Quick hack for simple week calendar
   const startDate = startOfWeek(selectedDate, { weekStartsOn: 1 });
@@ -16,6 +20,25 @@ export default function Menus() {
     queryFn: () => api.get(`/menus/date/${format(selectedDate, 'yyyy-MM-dd')}`)
       .then(res => res.data)
       .catch(() => null)
+  });
+
+
+
+  const copyMutation = useMutation({
+    mutationFn: () => api.post('/menus/copy', {
+      sourceDate: format(addDays(selectedDate, -1), 'yyyy-MM-dd'),
+      targetDate: format(selectedDate, 'yyyy-MM-dd')
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['menu', format(selectedDate, 'yyyy-MM-dd')] });
+    }
+  });
+
+  const publishMutation = useMutation({
+    mutationFn: (id: number) => api.patch(`/menus/${id}/publish`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['menu', format(selectedDate, 'yyyy-MM-dd')] });
+    }
   });
 
   return (
@@ -88,10 +111,30 @@ export default function Menus() {
                 )}
               </div>
               <div className="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-                <button className="btn-secondary">Copy Previous</button>
-                <button className="btn-primary">
-                  {menu ? 'Update Menu' : 'Create Menu'}
+                <button 
+                  onClick={() => copyMutation.mutate()}
+                  disabled={copyMutation.isPending}
+                  className="btn-secondary flex items-center"
+                >
+                  <Copy className="w-4 h-4 mr-2" /> Copy Previous
                 </button>
+                {menu && (
+                  <button 
+                    onClick={() => publishMutation.mutate(menu.id)}
+                    disabled={publishMutation.isPending}
+                    className="btn-secondary flex items-center"
+                  >
+                    <UploadCloud className="w-4 h-4 mr-2" /> {menu.published ? 'Unpublish' : 'Publish'}
+                  </button>
+                )}
+                {menu && (
+                  <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="btn-primary flex items-center"
+                  >
+                    <Edit2 className="w-4 h-4 mr-2" /> Edit Menu
+                  </button>
+                )}
               </div>
             </div>
 
@@ -104,9 +147,6 @@ export default function Menus() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-700 pb-2">
                       <h4 className="font-semibold text-slate-700 dark:text-slate-200">Lunch Items</h4>
-                      <button className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center">
-                        <Plus className="w-4 h-4 mr-1" /> Add Dish
-                      </button>
                     </div>
                     {menu.dishes?.filter((d:any) => d.mealType === 'LUNCH').map((dishItem: any, idx: number) => (
                       <div key={idx} className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl shadow-sm">
@@ -119,9 +159,6 @@ export default function Menus() {
                             <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500">{dishItem.dish.category}</p>
                           </div>
                         </div>
-                        <button className="text-slate-400 dark:text-slate-500 hover:text-red-500">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
                     ))}
                     {menu.dishes?.filter((d:any) => d.mealType === 'LUNCH').length === 0 && (
@@ -134,13 +171,31 @@ export default function Menus() {
                   <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                   <h3 className="text-lg font-medium text-slate-800 dark:text-slate-100">No menu planned</h3>
                   <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mt-1 mb-4">There is no menu planned for this date yet.</p>
-                  <button className="btn-primary">Create Menu Plan</button>
+                  <button 
+                    className="btn-primary"
+                    onClick={() => setIsAddModalOpen(true)}
+                  >
+                    Create Menu Plan
+                  </button>
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title={menu ? "Edit Menu Plan" : "Create Menu Plan"}
+      >
+        <MenuForm
+          selectedDate={selectedDate}
+          initialData={menu}
+          onSuccess={() => setIsAddModalOpen(false)}
+          onCancel={() => setIsAddModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

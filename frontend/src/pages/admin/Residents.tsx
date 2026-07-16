@@ -1,16 +1,40 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { Search, Filter, Plus, Edit2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
+import Modal from '../../components/Modal';
+import SadhakaForm from '../../components/forms/SadhakaForm';
 
 export default function Residents() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
+  const [activeCampOnly, setActiveCampOnly] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedResident, setSelectedResident] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  const archiveMutation = useMutation({
+    mutationFn: (id: number) => api.patch(`/residents/${id}/archive`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['residents'] });
+    }
+  });
+
+  const handleEdit = (resident: any) => {
+    setSelectedResident(resident);
+    setIsAddModalOpen(true);
+  };
+
+  const handleArchive = (id: number, code: string) => {
+    if (window.confirm(`Are you sure you want to archive resident ${code}?`)) {
+      archiveMutation.mutate(id);
+    }
+  };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['residents', page, search],
-    queryFn: () => api.get(`/residents?page=${page}&size=10&search=${search}`).then(res => res.data)
+    queryKey: ['residents', page, search, activeCampOnly],
+    queryFn: () => api.get(`/residents?page=${page}&size=10&search=${search}&activeCampOnly=${activeCampOnly}`).then(res => res.data)
   });
 
   return (
@@ -20,7 +44,13 @@ export default function Residents() {
           <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Sadhakas</h1>
           <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">Manage ashram Sadhakas and their camps</p>
         </div>
-        <button className="btn-primary flex items-center shrink-0">
+        <button 
+          className="btn-primary flex items-center shrink-0"
+          onClick={() => {
+            setSelectedResident(null);
+            setIsAddModalOpen(true);
+          }}
+        >
           <Plus className="w-4 h-4 mr-2" /> Add Sadhaka
         </button>
       </div>
@@ -38,8 +68,11 @@ export default function Residents() {
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          <button className="btn-secondary flex items-center justify-center">
-            <Filter className="w-4 h-4 mr-2" /> Filter
+          <button 
+            onClick={() => setActiveCampOnly(!activeCampOnly)}
+            className={`flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-colors duration-200 border text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 ${activeCampOnly ? 'bg-primary-50 text-primary-700 border-primary-200 dark:bg-primary-900/20 dark:text-primary-300 dark:border-primary-800' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'}`}
+          >
+            <Filter className="w-4 h-4 mr-2" /> {activeCampOnly ? 'Active Camps Only' : 'All Residents'}
           </button>
         </div>
 
@@ -87,10 +120,17 @@ export default function Residents() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50">
+                        <button 
+                          onClick={() => handleEdit(resident)}
+                          className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
+                        >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50">
+                        <button 
+                          onClick={() => handleArchive(resident.id, resident.residentCode)}
+                          disabled={archiveMutation.isPending}
+                          className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600 transition-colors rounded-lg hover:bg-red-50"
+                        >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -106,7 +146,7 @@ export default function Residents() {
         {data && data.totalPages > 1 && (
           <div className="p-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between text-sm">
             <span className="text-slate-500 dark:text-slate-400 dark:text-slate-500">
-              Showing {page * 10 + 1} to Math.min((page + 1) * 10, data.totalElements) of {data.totalElements} entries
+              Showing {page * 10 + 1} to {Math.min((page + 1) * 10, data.totalElements)} of {data.totalElements} entries
             </span>
             <div className="flex gap-1">
               <button 
@@ -127,6 +167,18 @@ export default function Residents() {
           </div>
         )}
       </div>
+
+      <Modal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)}
+        title={selectedResident ? "Edit Sadhaka" : "Add New Sadhaka"}
+      >
+        <SadhakaForm 
+          initialData={selectedResident}
+          onSuccess={() => setIsAddModalOpen(false)}
+          onCancel={() => setIsAddModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }

@@ -45,6 +45,10 @@ public class Resident {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "archived", nullable = false)
+    @Builder.Default
+    private boolean archived = false;
+
     /**
      * Get the currently active camp, if any.
      */

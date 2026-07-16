@@ -34,9 +34,9 @@ public class ResidentService {
      * Get all residents with search and pagination.
      */
     @Transactional(readOnly = true)
-    public PagedResponse<ResidentDto> getAllResidents(String search, int page, int size) {
+    public PagedResponse<ResidentDto> getAllResidents(String search, boolean activeCampOnly, int page, int size) {
         Page<Resident> residentPage = residentRepository.searchResidents(
-                search, PageRequest.of(page, size, Sort.by("residentCode").ascending()));
+                search, activeCampOnly, PageRequest.of(page, size, Sort.by("residentCode").ascending()));
 
         List<ResidentDto> content = residentPage.getContent().stream()
                 .map(residentMapper::toDto)
@@ -161,8 +161,24 @@ public class ResidentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Toggle archive status of a resident.
+     */
+    @Transactional
+    public ResidentDto archiveResident(Long id) {
+        Resident resident = findResidentOrThrow(id);
+        resident.setArchived(!resident.isArchived());
+        resident = residentRepository.save(resident);
+        log.info("Archived resident: {} (status: {})", resident.getResidentCode(), resident.isArchived());
+        return residentMapper.toDto(resident);
+    }
+
     private Resident findResidentOrThrow(Long id) {
-        return residentRepository.findById(id)
+        Resident resident = residentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resident", "id", id));
+        if (resident.isArchived()) {
+            throw new ResourceNotFoundException("Resident", "id", id);
+        }
+        return resident;
     }
 }

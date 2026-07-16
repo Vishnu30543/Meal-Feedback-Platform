@@ -17,9 +17,10 @@ public interface ResidentRepository extends JpaRepository<Resident, Long> {
 
     boolean existsByResidentCode(String residentCode);
 
-    @Query("SELECT r FROM Resident r WHERE " +
+    @Query("SELECT DISTINCT r FROM Resident r LEFT JOIN r.camps c WHERE r.archived = false AND " +
             "(:search IS NULL OR :search = '' OR " +
             "LOWER(r.residentCode) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<Resident> searchResidents(@Param("search") String search, Pageable pageable);
+            "LOWER(r.name) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:activeCampOnly = false OR (c.active = true AND c.startDate <= CURRENT_DATE AND c.endDate >= CURRENT_DATE))")
+    Page<Resident> searchResidents(@Param("search") String search, @Param("activeCampOnly") boolean activeCampOnly, Pageable pageable);
 }
