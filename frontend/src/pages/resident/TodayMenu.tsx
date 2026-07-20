@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Star, ChevronLeft, CheckCircle, Send } from 'lucide-react';
+import { Star, ChevronLeft, CheckCircle, Send, Bookmark, Info, Clock, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import Modal from '../../components/Modal';
 
 export default function TodayMenu() {
   const navigate = useNavigate();
@@ -12,10 +13,37 @@ export default function TodayMenu() {
   const [activeDishIndex, setActiveDishIndex] = useState(0);
   const [ratings, setRatings] = useState<Record<number, { rating: number, comment: string }>>({});
   
-  // Overall Lunch Rating State
   const [overallRating, setOverallRating] = useState<number>(0);
   const [overallComment, setOverallComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+
+  // Get saved recipes
+  const { data: savedRecipes } = useQuery({
+    queryKey: ['savedRecipes'],
+    queryFn: () => api.get('/cook-later').then(res => res.data)
+  });
+
+  const savedDishIds = new Set(savedRecipes?.map((item: any) => item.dish.id) || []);
+
+  const toggleSaveMutation = useMutation({
+    mutationFn: async (dishId: number) => {
+      if (savedDishIds.has(dishId)) {
+        await api.delete(`/cook-later/${dishId}`);
+      } else {
+        await api.post(`/cook-later/${dishId}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedRecipes'] });
+    }
+  });
+
+  const handleToggleSave = (e: React.MouseEvent, dishId: number) => {
+    e.stopPropagation();
+    toggleSaveMutation.mutate(dishId);
+  };
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
@@ -65,11 +93,12 @@ export default function TodayMenu() {
       await api.post(`/ratings/menu/${menu.id}`, payload);
       
       queryClient.invalidateQueries({ queryKey: ['ratingProgress'] });
-      alert('Thank you for your valuable feedback!');
-      navigate('/resident');
+      setIsSuccess(true);
+      setTimeout(() => {
+        navigate('/resident');
+      }, 2500);
     } catch {
       alert('Failed to submit ratings. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -81,6 +110,37 @@ export default function TodayMenu() {
       <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-2">The menu for today hasn't been published yet.</p>
     </div>
   );
+
+  if (isSuccess) {
+    return (
+      <div className="card p-12 text-center mt-10 flex flex-col items-center justify-center min-h-[400px]">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6"
+        >
+          <CheckCircle className="w-12 h-12 text-green-600" />
+        </motion.div>
+        <motion.h2 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="text-3xl font-bold text-slate-800 dark:text-slate-100 mb-3"
+        >
+          Thank You!
+        </motion.h2>
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-slate-500 dark:text-slate-400 text-lg max-w-md mx-auto"
+        >
+          Your feedback is incredibly valuable. It helps us serve you better every day.
+        </motion.p>
+      </div>
+    );
+  }
 
   const isLastDish = activeDishIndex === dishes.length - 1;
   const isOverallStep = activeDishIndex === dishes.length;
@@ -125,21 +185,39 @@ export default function TodayMenu() {
               transition={{ duration: 0.2 }}
               className="card overflow-hidden"
             >
-              {dishes[activeDishIndex].imageUrl && (
+              {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) && (
                 <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative">
                   <img 
-                    src={dishes[activeDishIndex].imageUrl} 
+                    src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl} 
                     alt={dishes[activeDishIndex].name}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3 bg-white dark:bg-slate-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm">
                     {dishes[activeDishIndex].category}
                   </div>
+                  <button 
+                    onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
+                    className="absolute top-3 right-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:scale-110 transition-transform"
+                    title={savedDishIds.has(dishes[activeDishIndex].id) ? "Remove from saved" : "Save for later"}
+                  >
+                    <Bookmark 
+                      className={`w-5 h-5 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`} 
+                    />
+                  </button>
                 </div>
               )}
               
               <div className="p-6">
-                <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-1">{dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}</h2>
+                <div className="flex justify-between items-start mb-1">
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}</h2>
+                  <button
+                    onClick={() => setIsDetailsModalOpen(true)}
+                    className="p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
+                    title="View Details"
+                  >
+                    <Info className="w-5 h-5" />
+                  </button>
+                </div>
                 <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mb-6 line-clamp-2">{dishes[activeDishIndex].description}</p>
 
                 <div className="flex flex-col items-center justify-center py-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl mb-6">
@@ -241,6 +319,64 @@ export default function TodayMenu() {
           </button>
         </div>
       )}
+
+      <Modal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        title={!isOverallStep && dishes[activeDishIndex] ? (dishes[activeDishIndex].displayName || dishes[activeDishIndex].name) : "Dish Details"}
+      >
+        {!isOverallStep && dishes[activeDishIndex] && (
+          <div className="space-y-4">
+            {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) && (
+              <img src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl} alt={dishes[activeDishIndex].name} className="w-full h-40 object-cover rounded-lg" />
+            )}
+            
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{dishes[activeDishIndex].description}</p>
+            
+            <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Clock className="w-4 h-4 mr-2 text-primary-500" />
+                {dishes[activeDishIndex].preparationTime || 0} mins
+              </div>
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 mr-2 text-primary-500" />
+                {dishes[activeDishIndex].difficulty || 'N/A'}
+              </div>
+            </div>
+
+            {dishes[activeDishIndex].healthBenefits && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{dishes[activeDishIndex].healthBenefits}</p>
+              </div>
+            )}
+            
+            {dishes[activeDishIndex].recipe?.ingredients && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{dishes[activeDishIndex].recipe.ingredients}</p>
+              </div>
+            )}
+
+            {dishes[activeDishIndex].recipe?.preparationSteps && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{dishes[activeDishIndex].recipe.preparationSteps}</p>
+              </div>
+            )}
+            
+            <div className="pt-2">
+              <button
+                onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
+                className="w-full btn-secondary py-2 flex items-center justify-center gap-2"
+              >
+                <Bookmark className={`w-4 h-4 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-current' : ''}`} />
+                {savedDishIds.has(dishes[activeDishIndex].id) ? 'Saved for Later' : 'Save Recipe'}
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

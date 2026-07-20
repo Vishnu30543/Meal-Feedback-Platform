@@ -58,6 +58,7 @@ public interface DishMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "slug", ignore = true)
+    @Mapping(target = "status", ignore = true)
     @Mapping(target = "images", ignore = true)
     @Mapping(target = "recipe", ignore = true)
     @Mapping(target = "nutrition", ignore = true)

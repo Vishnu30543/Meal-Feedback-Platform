@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ChevronLeft, Save } from 'lucide-react';
+import { ChevronLeft, Save, UploadCloud, Trash2 } from 'lucide-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 
@@ -10,11 +10,28 @@ export default function DishForm() {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(1);
 
+  const [isUploading, setIsUploading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     displayName: '',
     description: '',
-    category: 'CURRY'
+    category: 'CURRY',
+    recipe: {
+      ingredients: '',
+      preparationSteps: '',
+      preparationNotes: '',
+      healthBenefits: '',
+      youtubeUrl: ''
+    },
+    nutrition: {
+      energy: '',
+      carbohydrates: '',
+      protein: '',
+      fat: '',
+      fiber: ''
+    },
+    imageUrls: [] as string[]
   });
 
   const { data: existingDish, isLoading } = useQuery({
@@ -29,10 +46,58 @@ export default function DishForm() {
         name: existingDish.name || '',
         displayName: existingDish.displayName || '',
         description: existingDish.description || '',
-        category: existingDish.category || 'CURRY'
+        category: existingDish.category || 'CURRY',
+        recipe: {
+          ingredients: existingDish.recipe?.ingredients || '',
+          preparationSteps: existingDish.recipe?.preparationSteps || '',
+          preparationNotes: existingDish.recipe?.preparationNotes || '',
+          healthBenefits: existingDish.recipe?.healthBenefits || '',
+          youtubeUrl: existingDish.recipe?.youtubeUrl || ''
+        },
+        nutrition: {
+          energy: existingDish.nutrition?.energy || '',
+          carbohydrates: existingDish.nutrition?.carbohydrates || '',
+          protein: existingDish.nutrition?.protein || '',
+          fat: existingDish.nutrition?.fat || '',
+          fiber: existingDish.nutrition?.fiber || ''
+        },
+        imageUrls: existingDish.images?.map((img: any) => img.imageUrl) || []
       });
     }
   }, [existingDish]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'default_preset');
+      data.append('cloud_name', import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'demo');
+
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'demo'}/image/upload`, {
+        method: 'POST',
+        body: data,
+      });
+
+      const resData = await response.json();
+      if (resData.secure_url) {
+        setFormData(prev => ({
+          ...prev,
+          imageUrls: [...prev.imageUrls, resData.secure_url]
+        }));
+      } else {
+        alert('Upload failed: ' + (resData.error?.message || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('Upload failed. Please try again.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const mutation = useMutation({
     mutationFn: (data: typeof formData) => id ? api.put(`/dishes/${id}`, data) : api.post('/dishes', data),
@@ -135,9 +200,161 @@ export default function DishForm() {
           </div>
         )}
         
-        {step > 1 && (
-          <div className="flex-1 flex items-center justify-center text-slate-500 dark:text-slate-400 dark:text-slate-500 animate-in fade-in">
-            Form step {step} placeholder for {step === 2 ? 'Recipe' : step === 3 ? 'Nutrition' : 'Images'}
+        {step === 2 && (
+          <div className="space-y-5 animate-in fade-in">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Recipe Details</h3>
+            <div className="grid grid-cols-2 gap-5">
+              <div className="col-span-2">
+                <label className="label-text">Ingredients</label>
+                <textarea 
+                  className="input-field min-h-[100px]" 
+                  placeholder="List of ingredients..."
+                  value={formData.recipe.ingredients}
+                  onChange={(e) => setFormData({...formData, recipe: {...formData.recipe, ingredients: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="label-text">Preparation Steps</label>
+                <textarea 
+                  className="input-field min-h-[150px]" 
+                  placeholder="Step-by-step instructions..."
+                  value={formData.recipe.preparationSteps}
+                  onChange={(e) => setFormData({...formData, recipe: {...formData.recipe, preparationSteps: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Preparation Notes</label>
+                <textarea 
+                  className="input-field min-h-[100px]" 
+                  placeholder="Any additional notes..."
+                  value={formData.recipe.preparationNotes}
+                  onChange={(e) => setFormData({...formData, recipe: {...formData.recipe, preparationNotes: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Health Benefits</label>
+                <textarea 
+                  className="input-field min-h-[100px]" 
+                  placeholder="Health benefits..."
+                  value={formData.recipe.healthBenefits}
+                  onChange={(e) => setFormData({...formData, recipe: {...formData.recipe, healthBenefits: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2">
+                <label className="label-text">YouTube Video URL</label>
+                <input 
+                  type="url" 
+                  className="input-field" 
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={formData.recipe.youtubeUrl}
+                  onChange={(e) => setFormData({...formData, recipe: {...formData.recipe, youtubeUrl: e.target.value}})}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-5 animate-in fade-in">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Nutritional Information</h3>
+            <div className="grid grid-cols-2 gap-5">
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Energy (kcal)</label>
+                <input 
+                  type="number" 
+                  className="input-field" 
+                  placeholder="0.0"
+                  value={formData.nutrition.energy}
+                  onChange={(e) => setFormData({...formData, nutrition: {...formData.nutrition, energy: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Carbohydrates (g)</label>
+                <input 
+                  type="number" 
+                  className="input-field" 
+                  placeholder="0.0"
+                  value={formData.nutrition.carbohydrates}
+                  onChange={(e) => setFormData({...formData, nutrition: {...formData.nutrition, carbohydrates: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Protein (g)</label>
+                <input 
+                  type="number" 
+                  className="input-field" 
+                  placeholder="0.0"
+                  value={formData.nutrition.protein}
+                  onChange={(e) => setFormData({...formData, nutrition: {...formData.nutrition, protein: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Fat (g)</label>
+                <input 
+                  type="number" 
+                  className="input-field" 
+                  placeholder="0.0"
+                  value={formData.nutrition.fat}
+                  onChange={(e) => setFormData({...formData, nutrition: {...formData.nutrition, fat: e.target.value}})}
+                />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <label className="label-text">Fiber (g)</label>
+                <input 
+                  type="number" 
+                  className="input-field" 
+                  placeholder="0.0"
+                  value={formData.nutrition.fiber}
+                  onChange={(e) => setFormData({...formData, nutrition: {...formData.nutrition, fiber: e.target.value}})}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-5 animate-in fade-in">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Dish Images</h3>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-6">
+              {formData.imageUrls.map((url, idx) => (
+                <div key={idx} className="relative aspect-square rounded-xl overflow-hidden group">
+                  <img src={url} alt={`Dish ${idx + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button 
+                      onClick={() => setFormData(prev => ({...prev, imageUrls: prev.imageUrls.filter((_, i) => i !== idx)}))}
+                      className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                      type="button"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+              
+              <label className="aspect-square border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400">
+                {isUploading ? (
+                  <div className="w-6 h-6 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <>
+                    <UploadCloud className="w-8 h-8 mb-2 text-slate-400" />
+                    <span className="text-sm font-medium">Upload Image</span>
+                  </>
+                )}
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  className="hidden" 
+                  onChange={handleImageUpload}
+                  disabled={isUploading}
+                />
+              </label>
+            </div>
+            
+            <div className="bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 p-4 rounded-xl text-sm">
+              <p className="font-medium">Cloudinary Integration Note</p>
+              <p className="mt-1">Images are uploaded directly to Cloudinary using unsigned uploads. Make sure you have configured VITE_CLOUDINARY_CLOUD_NAME and VITE_CLOUDINARY_UPLOAD_PRESET in your .env.local file.</p>
+            </div>
           </div>
         )}
 

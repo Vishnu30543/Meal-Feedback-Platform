@@ -1,0 +1,382 @@
+[
+  {
+    "name": "Oil-Free Tomato Dal",
+    "displayName": "Manthena Style Tomato Pappu",
+    "category": "DAL",
+    "description": "A comforting, zero-oil and zero-salt dal made with tomatoes, green chilies, and tempered with dry-roasted spices.",
+    "preparationTime": 30,
+    "difficulty": "EASY",
+    "healthBenefits": "High in protein and lycopene. Excellent for heart health and blood pressure regulation.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+tomato+dal",
+    "imageUrls": [
+      "https://example.com/images/tomato-dal-1.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 1 cup Toor Dal (Pigeon peas)\n- 3 medium tomatoes, chopped\n- 4 green chilies, slit (adjust for spice, as no salt is used)\n- 1/4 tsp turmeric powder\n- 1 tsp mustard seeds\n- 1 tsp cumin seeds\n- A sprig of curry leaves\n- Fresh coriander for garnish",
+      "preparationSteps": "1. Wash and pressure cook toor dal along with chopped tomatoes, green chilies, turmeric, and 2 cups of water for 3-4 whistles.\n2. In a heated dry pan (no oil), add mustard seeds and cumin seeds. Let them splutter.\n3. Add curry leaves to the dry pan and roast for a few seconds.\n4. Pour the mashed dal mixture into the pan. Mix well and simmer for 5 minutes.\n5. Garnish with fresh coriander leaves and serve hot with brown rice or phulkas.",
+      "preparationNotes": "Green chilies and tomatoes compensate for the absence of salt. You can squeeze half a lemon before serving for extra tanginess.",
+      "healthBenefits": "Zero cholesterol, high fiber, and easily digestible.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+tomato+dal"
+    },
+    "nutrition": {
+      "energy": 120.0,
+      "carbohydrates": 20.5,
+      "protein": 7.0,
+      "fat": 1.0,
+      "fiber": 6.5
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": true,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Bottle Gourd Curry",
+    "displayName": "Sorakaya Kura (Zero Oil/Salt)",
+    "category": "CURRY",
+    "description": "A hydrating and mild bottle gourd curry cooked with coconut paste for natural richness.",
+    "preparationTime": 25,
+    "difficulty": "EASY",
+    "healthBenefits": "Extremely hydrating, aids in weight loss, and promotes urinary tract health.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+bottle+gourd+curry",
+    "imageUrls": [
+      "https://example.com/images/bottle-gourd-1.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 2 cups bottle gourd (sorakaya), peeled and cubed\n- 1 onion, finely chopped\n- 3 green chilies, paste\n- 2 tbsp fresh grated coconut\n- 1/2 tsp cumin powder\n- 1/4 tsp turmeric\n- Coriander leaves",
+      "preparationSteps": "1. Blend fresh coconut and green chilies into a fine paste using a little water.\n2. Heat a thick-bottomed pan, add onions and dry roast them. Sprinkle a little water if they stick to the pan.\n3. Add bottle gourd pieces, turmeric, and cumin powder. Cover and cook on low heat. The vegetable will release its own water.\n4. Once the bottle gourd is half cooked, add the coconut-chili paste.\n5. Simmer for another 10 minutes until the vegetable is soft. Garnish with coriander.",
+      "preparationNotes": "Do not add excess water initially as bottle gourd has high water content.",
+      "healthBenefits": "Low calorie, alkalizing effect on the body.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+bottle+gourd+curry"
+    },
+    "nutrition": {
+      "energy": 65.0,
+      "carbohydrates": 10.0,
+      "protein": 1.5,
+      "fat": 2.5,
+      "fiber": 3.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": true,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Mixed Sprouts Salad",
+    "displayName": "Nature Cure Sprouts Bowl",
+    "category": "SALAD",
+    "description": "A highly nutritious raw salad featuring mixed sprouts, fresh fruits, and a lemon-pepper dressing.",
+    "preparationTime": 15,
+    "difficulty": "EASY",
+    "healthBenefits": "Packed with live enzymes, vitamins, and high biological value protein.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sprouts",
+    "imageUrls": [
+      "https://example.com/images/sprouts-salad.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 1 cup moong bean sprouts\n- 1/2 cup chickpea sprouts\n- 1/4 cup pomegranate seeds\n- 1/2 onion, finely chopped\n- 1 tomato, finely chopped\n- 1/2 cucumber, diced\n- 1 tbsp lemon juice\n- 1/2 tsp freshly ground black pepper\n- 1 tsp honey (optional)",
+      "preparationSteps": "1. Steam the chickpea sprouts for 5 minutes if they are too hard, otherwise use raw.\n2. In a large mixing bowl, combine moong sprouts, chickpea sprouts, onions, tomatoes, cucumber, and pomegranate seeds.\n3. In a small cup, mix lemon juice, black pepper, and honey.\n4. Pour the dressing over the sprouts and toss well.\n5. Serve immediately for breakfast or as an evening snack.",
+      "preparationNotes": "Make sure to sprout the beans at home for maximum hygiene and vitality.",
+      "healthBenefits": "Boosts immunity and improves digestion due to high fiber and live enzymes.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sprouts"
+    },
+    "nutrition": {
+      "energy": 110.0,
+      "carbohydrates": 22.0,
+      "protein": 6.5,
+      "fat": 0.5,
+      "fiber": 5.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Raw Banana Curry",
+    "displayName": "Aratikaya Kura",
+    "category": "CURRY",
+    "description": "A dry preparation of raw banana spiced with roasted sesame and coriander powder, without a drop of oil.",
+    "preparationTime": 35,
+    "difficulty": "MEDIUM",
+    "healthBenefits": "Excellent source of resistant starch and potassium. Good for gut bacteria.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+raw+banana",
+    "imageUrls": [
+      "https://example.com/images/raw-banana.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 2 raw bananas (green plantains)\n- 2 tbsp roasted sesame seed powder\n- 1 tsp coriander powder\n- 1/2 tsp ginger-green chili paste\n- 1/2 tsp mustard seeds\n- Curry leaves",
+      "preparationSteps": "1. Boil the raw bananas with their skin on until just tender. Let them cool, peel, and cut into cubes.\n2. Heat a dry non-stick or heavy-bottomed pan. Add mustard seeds and wait for them to pop.\n3. Add curry leaves and ginger-green chili paste. Saut\u00e9 dry for a minute.\n4. Add the boiled banana cubes and mix gently.\n5. Sprinkle roasted sesame powder and coriander powder evenly. Toss well to coat the pieces.\n6. Cook for 2-3 minutes on low heat and serve.",
+      "preparationNotes": "Do not overboil the bananas; they should retain their shape.",
+      "healthBenefits": "Rich in potassium and helps manage blood sugar levels due to resistant starch.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+raw+banana"
+    },
+    "nutrition": {
+      "energy": 140.0,
+      "carbohydrates": 28.0,
+      "protein": 2.5,
+      "fat": 3.0,
+      "fiber": 4.5
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": true,
+      "treeNuts": false,
+      "mustard": true,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Dates and Nuts Laddu",
+    "displayName": "Sugar-Free Dry Fruit Sweet",
+    "category": "SWEET",
+    "description": "A guilt-free energy bite made purely from natural sweetness of dates and crunch of mixed nuts.",
+    "preparationTime": 15,
+    "difficulty": "EASY",
+    "healthBenefits": "Instant energy booster, rich in iron, healthy fats, and antioxidants.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sweet",
+    "imageUrls": [
+      "https://example.com/images/dates-laddu.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 2 cups soft dates (seedless)\n- 1/2 cup almonds\n- 1/2 cup walnuts\n- 1/4 cup cashews\n- 2 tbsp pumpkin seeds\n- 1/2 tsp cardamom powder",
+      "preparationSteps": "1. Dry roast the almonds, walnuts, cashews, and pumpkin seeds slightly to enhance their crunch. Chop them coarsely.\n2. Blend the soft dates in a mixer until they form a sticky mass.\n3. In a bowl, combine the date mass, chopped nuts, and cardamom powder. Mix thoroughly with your hands.\n4. Take small portions of the mixture and roll them into round laddus.\n5. Store in an airtight container.",
+      "preparationNotes": "If the dates are hard, soak them in warm water for 10 minutes and drain completely before blending.",
+      "healthBenefits": "Excellent alternative to refined sugar sweets. Promotes brain health and hemoglobin levels.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sweet"
+    },
+    "nutrition": {
+      "energy": 180.0,
+      "carbohydrates": 25.0,
+      "protein": 4.0,
+      "fat": 8.0,
+      "fiber": 4.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": true,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Ridge Gourd Curry",
+    "displayName": "Beerakaya Kura with Peanut Powder",
+    "category": "CURRY",
+    "description": "Soft ridge gourd cooked in its own juices and finished with roasted peanut powder for a rich taste without oil.",
+    "preparationTime": 30,
+    "difficulty": "EASY",
+    "healthBenefits": "High water content and fiber, aids in purifying blood and improving digestion.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ridge+gourd",
+    "imageUrls": [
+      "https://example.com/images/ridge-gourd.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 2 cups peeled and chopped ridge gourd (beerakaya)\n- 1 tomato, chopped\n- 2 tbsp roasted peanut powder\n- 2 green chilies, slit\n- 1/4 tsp turmeric\n- Fresh coriander",
+      "preparationSteps": "1. Heat a dry pan. Add chopped tomatoes, green chilies, and turmeric. Saut\u00e9 for a minute.\n2. Add the chopped ridge gourd pieces. Cover with a lid. The vegetable will release enough water to cook itself.\n3. Cook on medium-low flame for 15 minutes until the ridge gourd is tender.\n4. Stir in the roasted peanut powder and cook for another 2 minutes.\n5. Garnish with fresh coriander.",
+      "preparationNotes": "Peanut powder acts as a healthy fat replacement for oil and gives the curry a rich, thick consistency.",
+      "healthBenefits": "Lowers blood sugar naturally and prevents constipation.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ridge+gourd"
+    },
+    "nutrition": {
+      "energy": 90.0,
+      "carbohydrates": 9.0,
+      "protein": 4.0,
+      "fat": 4.5,
+      "fiber": 3.5
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": true,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Drumstick Leaves Dal",
+    "displayName": "Munagaku Pappu",
+    "category": "DAL",
+    "description": "A nutrient-dense dal made with fresh moringa leaves and moong dal, prepared strictly without oil or salt.",
+    "preparationTime": 40,
+    "difficulty": "MEDIUM",
+    "healthBenefits": "Moringa leaves are a superfood, incredibly rich in iron, calcium, and Vitamin A.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+munagaku",
+    "imageUrls": [
+      "https://example.com/images/munagaku-dal.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 1 cup Moong dal (Yellow lentils)\n- 2 cups fresh drumstick leaves (Moringa/Munagaku), washed and separated from stems\n- 1 onion, chopped\n- 3-4 green chilies\n- 4 cloves garlic, crushed\n- 1/4 tsp turmeric\n- 1 tsp cumin seeds",
+      "preparationSteps": "1. Dry roast moong dal slightly in a pan until warm, then wash it.\n2. In a pressure cooker, add the washed dal, onions, green chilies, turmeric, and 2.5 cups of water. Cook for 2 whistles.\n3. Once pressure releases, open the lid, add the fresh drumstick leaves and crushed garlic. (Adding leaves later retains their nutrients and color).\n4. Cook open on a low flame for 5-7 minutes until the leaves soften.\n5. In a separate small dry pan, dry roast cumin seeds until fragrant and add to the dal as tempering.",
+      "preparationNotes": "Never overcook moringa leaves as they can turn bitter. The garlic and green chilies provide ample flavor to compensate for the missing salt.",
+      "healthBenefits": "Acts as a natural multivitamin, strengthens bones, and boosts immunity.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+munagaku"
+    },
+    "nutrition": {
+      "energy": 135.0,
+      "carbohydrates": 21.0,
+      "protein": 9.5,
+      "fat": 0.8,
+      "fiber": 7.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Carrot Beetroot Fry",
+    "displayName": "Oil-Free Carrot Beetroot Poriyal",
+    "category": "CURRY",
+    "description": "A colorful, sweet and spicy dry vegetable preparation using grated carrots and beets.",
+    "preparationTime": 20,
+    "difficulty": "EASY",
+    "healthBenefits": "High in beta-carotene and natural nitrates. Great for skin, eyes, and blood circulation.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+carrot+beetroot",
+    "imageUrls": [
+      "https://example.com/images/carrot-beet-1.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 1 cup grated carrots\n- 1 cup grated beetroot\n- 2 tbsp fresh grated coconut\n- 2 green chilies, finely chopped\n- 1/2 tsp cumin seeds\n- Curry leaves\n- 1 tsp lemon juice",
+      "preparationSteps": "1. Heat a heavy-bottomed pan. Add cumin seeds and curry leaves. Dry roast for 30 seconds.\n2. Add the chopped green chilies and saut\u00e9 for a few seconds.\n3. Add the grated carrots and beetroot. Mix well, cover, and cook on a very low flame for 8-10 minutes. The natural moisture is enough to steam them.\n4. Once the raw smell disappears and veggies are tender, turn off the heat.\n5. Stir in the fresh grated coconut and lemon juice before serving.",
+      "preparationNotes": "Grating the vegetables ensures they cook quickly without the need for added oil or water.",
+      "healthBenefits": "Improves hemoglobin levels and provides glowing skin.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+carrot+beetroot"
+    },
+    "nutrition": {
+      "energy": 75.0,
+      "carbohydrates": 14.0,
+      "protein": 2.0,
+      "fat": 1.5,
+      "fiber": 4.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": true,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Brown Rice Vegetable Pulao",
+    "displayName": "Nature Cure Veg Pulao",
+    "category": "RICE",
+    "description": "A fragrant, wholesome brown rice pulao loaded with vegetables and whole spices, cooked purely in water.",
+    "preparationTime": 50,
+    "difficulty": "MEDIUM",
+    "healthBenefits": "Provides complex carbohydrates and fiber for sustained energy release. Good for diabetics.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+brown+rice",
+    "imageUrls": [
+      "https://example.com/images/brown-rice-pulao.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 1 cup soaked brown rice (soaked for 2 hours)\n- 1.5 cups mixed chopped vegetables (beans, carrots, peas, cauliflower)\n- 1 onion, thinly sliced\n- 1 tsp ginger-garlic paste\n- 2 cloves, 1 inch cinnamon, 1 cardamom, 1 bay leaf\n- 3 green chilies, slit\n- 1/2 cup fresh mint and coriander leaves",
+      "preparationSteps": "1. Heat a pressure cooker. Dry roast the whole spices (cloves, cinnamon, cardamom, bay leaf) until fragrant.\n2. Add sliced onions and dry saut\u00e9. Sprinkle a little water if they stick. Add ginger-garlic paste and saut\u00e9 until the raw smell goes away.\n3. Add all the mixed vegetables, green chilies, mint, and coriander leaves. Stir well.\n4. Drain the brown rice and add it to the cooker. Pour 2.5 cups of water.\n5. Close the lid and cook for 4-5 whistles. Let the pressure release naturally.\n6. Fluff gently with a fork and serve hot with onion-cucumber raita (made with vegan curd or highly diluted buttermilk if permitted).",
+      "preparationNotes": "Soaking brown rice is crucial for it to cook properly and for better nutrient absorption.",
+      "healthBenefits": "Low glycemic index meal packed with micronutrients.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+brown+rice"
+    },
+    "nutrition": {
+      "energy": 210.0,
+      "carbohydrates": 42.0,
+      "protein": 5.5,
+      "fat": 1.5,
+      "fiber": 6.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Ragi Malt",
+    "displayName": "Ambali (Finger Millet Porridge)",
+    "category": "BEVERAGE",
+    "description": "A traditional, cooling, and strengthening drink made with ragi flour, naturally flavored with lemon and onions.",
+    "preparationTime": 15,
+    "difficulty": "EASY",
+    "healthBenefits": "Exceptionally high in natural calcium. Cools the body and acts as a great morning energy booster.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ragi+malt",
+    "imageUrls": [
+      "https://example.com/images/ragi-malt.jpg"
+    ],
+    "recipe": {
+      "ingredients": "- 2 tbsp Ragi (Finger Millet) flour\n- 2 cups water\n- 1 tbsp finely chopped raw onions\n- 1 green chili, very finely chopped\n- 1 tbsp lemon juice\n- Fresh coriander leaves",
+      "preparationSteps": "1. In a small bowl, mix the ragi flour with 1/2 cup of water to make a lump-free paste.\n2. Boil the remaining 1.5 cups of water in a saucepan.\n3. Slowly pour the ragi paste into the boiling water while stirring continuously to prevent lumps.\n4. Cook on low medium heat for 5-7 minutes until the mixture thickens and looks glossy.\n5. Turn off the heat and let it cool completely.\n6. Stir in chopped onions, green chilies, lemon juice, and coriander just before serving.",
+      "preparationNotes": "For a fermented version (which is even healthier), let the cooked ragi cool and sit overnight before adding the flavorings the next morning.",
+      "healthBenefits": "Best non-dairy source of calcium. Helps in weight management and prevents osteoporosis.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ragi+malt"
+    },
+    "nutrition": {
+      "energy": 70.0,
+      "carbohydrates": 15.0,
+      "protein": 1.8,
+      "fat": 0.4,
+      "fiber": 2.5
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": false,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  }
+]

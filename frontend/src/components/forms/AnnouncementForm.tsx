@@ -86,6 +86,17 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
         </div>
       </div>
 
+      <div>
+        <label className="label-text">Image URL (Optional)</label>
+        <input
+          type="url"
+          className="input-field"
+          value={formData.imageUrl}
+          onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+          placeholder="https://example.com/image.jpg"
+        />
+      </div>
+
       <div className="flex items-center gap-2 mt-2">
         <input
           type="checkbox"

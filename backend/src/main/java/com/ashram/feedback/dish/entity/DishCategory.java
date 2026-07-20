@@ -5,5 +5,9 @@ public enum DishCategory {
     SOUP,
     RICE,
     ROTI,
-    CURD
+    CURD,
+    DAL,
+    SALAD,
+    SWEET,
+    BEVERAGE
 }

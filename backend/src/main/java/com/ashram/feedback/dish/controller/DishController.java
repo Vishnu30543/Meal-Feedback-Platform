@@ -129,4 +129,40 @@ public class DishController {
         dishService.removeImage(id, imageId);
         return ResponseEntity.ok(ApiResponse.success("Image removed successfully"));
     }
+    @GetMapping("/import-manthena")
+    public ResponseEntity<String> importManthena() {
+        try {
+            java.io.File file = new java.io.File("src/main/manthena_satyanarayana_recipes.json");
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            List<CreateDishRequest> dishes = mapper.readValue(file, new com.fasterxml.jackson.core.type.TypeReference<List<CreateDishRequest>>() {});
+            for (CreateDishRequest req : dishes) {
+                String slug = com.ashram.feedback.common.util.SlugUtil.toSlug(req.getName());
+                try {
+                    DishDto existing = dishService.getDishBySlug(slug);
+                    
+                    UpdateDishRequest updateReq = new UpdateDishRequest();
+                    updateReq.setName(req.getName());
+                    updateReq.setDisplayName(req.getDisplayName());
+                    updateReq.setCategory(req.getCategory());
+                    updateReq.setDescription(req.getDescription());
+                    updateReq.setPreparationTime(req.getPreparationTime());
+                    updateReq.setDifficulty(req.getDifficulty());
+                    updateReq.setHealthBenefits(req.getHealthBenefits());
+                    updateReq.setYoutubeUrl(req.getYoutubeUrl());
+                    updateReq.setStatus(DishStatus.ACTIVE);
+                    updateReq.setRecipe(req.getRecipe());
+                    updateReq.setNutrition(req.getNutrition());
+                    updateReq.setAllergen(req.getAllergen());
+
+                    dishService.updateDish(existing.getId(), updateReq);
+                } catch (com.ashram.feedback.common.exception.ResourceNotFoundException e) {
+                    dishService.createDish(req);
+                }
+            }
+            return ResponseEntity.ok("Imported successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
+    }
 }

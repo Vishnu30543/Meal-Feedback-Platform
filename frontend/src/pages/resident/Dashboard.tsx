@@ -1,11 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check } from 'lucide-react';
+import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
+import Modal from '../../components/Modal';
 
 export default function ResidentDashboard() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [selectedDish, setSelectedDish] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch Progress
   const { data: progress, isLoading: loadingProgress } = useQuery({
@@ -25,7 +31,36 @@ export default function ResidentDashboard() {
     queryFn: () => api.get('/health-tips/today').then(res => res.data)
   });
 
-  const isLoading = loadingProgress || loadingStats || loadingTips;
+  // Fetch Today's Menu
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+  const { data: menu, isLoading: loadingMenu } = useQuery({
+    queryKey: ['menu', todayStr],
+    queryFn: () => api.get(`/menus/date/${todayStr}`).then(res => res.data)
+  });
+
+  // Fetch Saved Recipes
+  const { data: savedRecipes, isLoading: loadingSaved } = useQuery({
+    queryKey: ['savedRecipes'],
+    queryFn: () => api.get('/cook-later').then(res => res.data)
+  });
+
+  const savedDishIds = new Set(savedRecipes?.map((item: any) => item.dish.id) || []);
+
+  const toggleSaveMutation = useMutation({
+    mutationFn: async (dishId: number) => {
+      if (savedDishIds.has(dishId)) {
+        await api.delete(`/cook-later/${dishId}`);
+      } else {
+        await api.post(`/cook-later/${dishId}`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savedRecipes'] });
+      queryClient.invalidateQueries({ queryKey: ['residentStats'] });
+    }
+  });
+
+  const isLoading = loadingProgress || loadingStats || loadingTips || loadingMenu || loadingSaved;
 
   if (isLoading) {
     return (
@@ -94,6 +129,62 @@ export default function ResidentDashboard() {
         </div>
       </div>
 
+      {/* Today's Menu Display */}
+      {menu?.dishes && menu.dishes.length > 0 && (
+        <div className="card p-6">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
+            <Utensils className="w-5 h-5 text-primary-500" />
+            Today's Menu Directory
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {menu.dishes.map((md: any, idx: number) => (
+              <div key={idx} className="card overflow-hidden bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                <div className="h-40 relative">
+                  {md.dish.primaryImageUrl || md.dish.imageUrl ? (
+                    <img src={md.dish.primaryImageUrl || md.dish.imageUrl} alt={md.dish.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-primary-100 flex items-center justify-center">
+                      <Utensils className="w-8 h-8 text-primary-500" />
+                    </div>
+                  )}
+                  <div className="absolute top-2 left-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-primary-700 shadow-sm">
+                    {md.dish.category}
+                  </div>
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleSaveMutation.mutate(md.dish.id);
+                    }}
+                    className="absolute top-2 right-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform"
+                    title={savedDishIds.has(md.dish.id) ? "Remove from saved" : "Save for later"}
+                  >
+                    <Bookmark 
+                      className={`w-4 h-4 ${savedDishIds.has(md.dish.id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`} 
+                    />
+                  </button>
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{md.dish.displayName || md.dish.name}</h4>
+                    <button
+                      onClick={() => {
+                        setSelectedDish(md.dish);
+                        setIsModalOpen(true);
+                      }}
+                      className="text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 p-1 rounded transition-colors"
+                      title="View Details"
+                    >
+                      <Info className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 line-clamp-2">{md.dish.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Mini Stats Row */}
       <div className="grid grid-cols-2 gap-4">
         <div className="card p-5 flex items-center gap-4">
@@ -131,6 +222,67 @@ export default function ResidentDashboard() {
         </div>
       )}
 
+    {/* Dish Details Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={selectedDish ? (selectedDish.displayName || selectedDish.name) : "Dish Details"}
+      >
+        {selectedDish && (
+          <div className="space-y-4">
+            {(selectedDish.primaryImageUrl || selectedDish.imageUrl) && (
+              <img src={selectedDish.primaryImageUrl || selectedDish.imageUrl} alt={selectedDish.name} className="w-full h-40 object-cover rounded-lg" />
+            )}
+            
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{selectedDish.description}</p>
+            
+            <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Clock className="w-4 h-4 mr-2 text-primary-500" />
+                {selectedDish.preparationTime || 0} mins
+              </div>
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Check className="w-4 h-4 mr-2 text-primary-500" />
+                {selectedDish.difficulty || 'N/A'}
+              </div>
+            </div>
+
+            {selectedDish.healthBenefits && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{selectedDish.healthBenefits}</p>
+              </div>
+            )}
+            
+            {selectedDish.recipe?.ingredients && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{selectedDish.recipe.ingredients}</p>
+              </div>
+            )}
+
+            {selectedDish.recipe?.preparationSteps && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{selectedDish.recipe.preparationSteps}</p>
+              </div>
+            )}
+            
+            <div className="pt-2">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleSaveMutation.mutate(selectedDish.id);
+                }}
+                className="w-full btn-secondary py-2 flex items-center justify-center gap-2"
+              >
+                <Bookmark className={`w-4 h-4 ${savedDishIds.has(selectedDish.id) ? 'fill-current' : ''}`} />
+                {savedDishIds.has(selectedDish.id) ? 'Saved for Later' : 'Save Recipe'}
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
