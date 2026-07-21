@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Loader2, Bell, History } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, History } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
-import Modal from '../../components/Modal';
+import DishDetailsModal from '../../components/DishDetailsModal';
 
 export default function ResidentDashboard() {
   const { user } = useAuth();
@@ -60,14 +60,7 @@ export default function ResidentDashboard() {
     }
   });
 
-  const { data: fullDish, isLoading: isLoadingFullDish } = useQuery({
-    queryKey: ['dish', selectedDish?.id],
-    queryFn: () => api.get(`/dishes/${selectedDish.id}`).then(res => res.data.data),
-    enabled: !!selectedDish?.id && isModalOpen
-  });
 
-  // Use fullDish when available, fall back to summary (which now includes description)
-  const displayDish = fullDish || selectedDish;
 
   // Only show full-page spinner on the very first load (when we have NO data at all yet)
   const isInitialLoad = loadingMenu && !menu && !progress && !stats;
@@ -300,83 +293,15 @@ export default function ResidentDashboard() {
         </div>
       )}
 
-      {/* Dish Details Modal */}
-      <Modal
+      <DishDetailsModal
+        dishId={selectedDish?.id || null}
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
           setTimeout(() => setSelectedDish(null), 300);
         }}
-        title={displayDish ? (displayDish.displayName || displayDish.name) : "Dish Details"}
-      >
-        {!displayDish ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {(displayDish.primaryImageUrl || displayDish.imageUrl) && (
-              <img src={displayDish.primaryImageUrl || displayDish.imageUrl} alt={displayDish.name} className="w-full h-40 object-cover rounded-lg" />
-            )}
-
-            <p className="text-slate-600 dark:text-slate-300 text-sm">{displayDish.description}</p>
-
-            <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
-              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
-                <Clock className="w-4 h-4 mr-2 text-primary-500" />
-                {displayDish.preparationTime || 0} mins
-              </div>
-              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
-                <Check className="w-4 h-4 mr-2 text-primary-500" />
-                {displayDish.difficulty || 'N/A'}
-              </div>
-            </div>
-
-            {displayDish.healthBenefits && (
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{displayDish.healthBenefits}</p>
-              </div>
-            )}
-
-            {isLoadingFullDish ? (
-              <div className="flex items-center gap-2 text-sm text-slate-400 py-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Loading full recipe details...
-              </div>
-            ) : (
-              <>
-                {displayDish.recipe?.ingredients && (
-                  <div>
-                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.ingredients}</p>
-                  </div>
-                )}
-
-                {displayDish.recipe?.preparationSteps && (
-                  <div>
-                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.preparationSteps}</p>
-                  </div>
-                )}
-              </>
-            )}
-
-            <div className="pt-2">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleSaveMutation.mutate(displayDish.id);
-                }}
-                className="w-full btn-secondary py-2 flex items-center justify-center gap-2"
-              >
-                <Bookmark className={`w-4 h-4 ${savedDishIds.has(displayDish.id) ? 'fill-current' : ''}`} />
-                {savedDishIds.has(displayDish.id) ? 'Saved for Later' : 'Save Recipe'}
-              </button>
-            </div>
-          </div>
-        )}
-      </Modal>
+        savedDishIds={savedDishIds}
+      />
     </div>
   );
 }
