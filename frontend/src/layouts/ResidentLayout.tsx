@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
-import { Home, History, Star, LogOut, Utensils } from 'lucide-react';
+import { Home, Star, LogOut, Utensils } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ResidentLayout() {
@@ -10,7 +10,6 @@ export default function ResidentLayout() {
 
   const navItems = [
     { name: 'Today', path: '/resident', icon: Home },
-    { name: 'History', path: '/resident/history', icon: History },
     { name: 'Favourites', path: '/resident/favourites', icon: Star },
     { name: 'Saved', path: '/resident/saved', icon: Utensils },
   ];

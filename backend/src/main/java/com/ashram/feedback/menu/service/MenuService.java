@@ -18,6 +18,8 @@ import com.ashram.feedback.menu.repository.DailyMenuDishRepository;
 import com.ashram.feedback.menu.repository.DailyMenuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,6 +44,7 @@ public class MenuService {
     /**
      * Get today's published menu.
      */
+    @Cacheable(value = "menuByDate", key = "'today-' + T(java.time.LocalDate).now().toString()")
     @Transactional(readOnly = true)
     public DailyMenuDto getTodaysMenu() {
         DailyMenu menu = menuRepository.findPublishedByDate(LocalDate.now())
@@ -53,6 +56,7 @@ public class MenuService {
     /**
      * Get menu by date.
      */
+    @Cacheable(value = "menuByDate", key = "#date.toString()")
     @Transactional(readOnly = true)
     public DailyMenuDto getMenuByDate(LocalDate date) {
         DailyMenu menu = menuRepository.findByMenuDate(date)
@@ -79,6 +83,7 @@ public class MenuService {
     /**
      * Create a new menu for a date.
      */
+    @CacheEvict(value = "menuByDate", allEntries = true)
     @Transactional
     public DailyMenuDto createMenu(CreateMenuRequest request) {
         if (menuRepository.existsByMenuDate(request.getMenuDate())) {
@@ -122,6 +127,7 @@ public class MenuService {
     /**
      * Update menu dishes.
      */
+    @CacheEvict(value = "menuByDate", allEntries = true)
     @Transactional
     public DailyMenuDto updateMenu(Long id, CreateMenuRequest request) {
         DailyMenu menu = findMenuOrThrow(id);
@@ -158,6 +164,7 @@ public class MenuService {
     /**
      * Copy a previous menu to a target date.
      */
+    @CacheEvict(value = "menuByDate", allEntries = true)
     @Transactional
     public DailyMenuDto copyMenu(CopyMenuRequest request) {
         DailyMenu source = menuRepository.findByMenuDate(request.getSourceDate())
@@ -196,6 +203,7 @@ public class MenuService {
     /**
      * Toggle menu published status.
      */
+    @CacheEvict(value = "menuByDate", allEntries = true)
     @Transactional
     public DailyMenuDto togglePublish(Long id) {
         DailyMenu menu = findMenuOrThrow(id);

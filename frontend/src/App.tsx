@@ -20,7 +20,6 @@ const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
 const ResidentDashboard = lazy(() => import('./pages/resident/Dashboard'));
 const ResidentTodayMenu = lazy(() => import('./pages/resident/TodayMenu'));
-const ResidentHistory = lazy(() => import('./pages/resident/History'));
 const ResidentFavourites = lazy(() => import('./pages/resident/Favourites'));
 const ResidentSavedRecipes = lazy(() => import('./pages/resident/SavedRecipes'));
 
@@ -71,7 +70,6 @@ function App() {
         }>
           <Route index element={<ResidentDashboard />} />
           <Route path="menu/today" element={<ResidentTodayMenu />} />
-          <Route path="history" element={<ResidentHistory />} />
           <Route path="favourites" element={<ResidentFavourites />} />
           <Route path="saved" element={<ResidentSavedRecipes />} />
         </Route>

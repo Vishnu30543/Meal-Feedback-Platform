@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -34,6 +36,8 @@ public class UpdateDishRequest {
     private String youtubeUrl;
 
     private DishStatus status;
+
+    private List<String> imageUrls;
 
     @Valid
     private RecipeDto recipe;

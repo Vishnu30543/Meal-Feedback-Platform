@@ -24,7 +24,7 @@ public class CookLaterController {
     private final CookLaterService cookLaterService;
 
     @GetMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Get my saved recipes")
     public ResponseEntity<ApiResponse<List<CookLaterDto>>> getMySavedRecipes(
             @AuthenticationPrincipal JwtUserPrincipal principal) {
@@ -33,7 +33,7 @@ public class CookLaterController {
     }
 
     @PostMapping("/{dishId}")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Save recipe for later")
     public ResponseEntity<ApiResponse<CookLaterDto>> saveRecipe(
             @PathVariable Long dishId,
@@ -44,7 +44,7 @@ public class CookLaterController {
     }
 
     @DeleteMapping("/{dishId}")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Remove saved recipe")
     public ResponseEntity<ApiResponse<Void>> removeRecipe(
             @PathVariable Long dishId,

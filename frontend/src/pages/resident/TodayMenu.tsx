@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Star, ChevronLeft, CheckCircle, Send, Bookmark, Info, Clock, Check } from 'lucide-react';
+import { Star, ChevronLeft, CheckCircle, Send, Bookmark, Info, Clock, Check, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -37,6 +37,7 @@ export default function TodayMenu() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savedRecipes'] });
+      queryClient.invalidateQueries({ queryKey: ['residentStats'] });
     }
   });
 
@@ -53,6 +54,15 @@ export default function TodayMenu() {
   });
 
   const dishes = menu?.dishes?.map((md: any) => md.dish) || [];
+
+  const { data: fullDish, isLoading: isLoadingFullDish } = useQuery({
+    queryKey: ['dish', !isOverallStep && dishes[activeDishIndex]?.id],
+    queryFn: () => api.get(`/dishes/${dishes[activeDishIndex].id}`).then(res => res.data.data),
+    enabled: !!(!isOverallStep && dishes[activeDishIndex]?.id) && isDetailsModalOpen
+  });
+
+  // Fall back to summary (which now has description, difficulty, healthBenefits)
+  const displayDish = fullDish || (!isOverallStep ? dishes[activeDishIndex] : null);
 
   const handleRatingChange = (dishId: number, rating: number) => {
     setRatings(prev => ({
@@ -323,55 +333,64 @@ export default function TodayMenu() {
       <Modal
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
-        title={!isOverallStep && dishes[activeDishIndex] ? (dishes[activeDishIndex].displayName || dishes[activeDishIndex].name) : "Dish Details"}
+        title={displayDish ? (displayDish.displayName || displayDish.name) : "Dish Details"}
       >
-        {!isOverallStep && dishes[activeDishIndex] && (
+        {displayDish && (
           <div className="space-y-4">
-            {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) && (
-              <img src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl} alt={dishes[activeDishIndex].name} className="w-full h-40 object-cover rounded-lg" />
+            {(displayDish.primaryImageUrl || displayDish.imageUrl) && (
+              <img src={displayDish.primaryImageUrl || displayDish.imageUrl} alt={displayDish.name} className="w-full h-40 object-cover rounded-lg" />
             )}
             
-            <p className="text-slate-600 dark:text-slate-300 text-sm">{dishes[activeDishIndex].description}</p>
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{displayDish.description}</p>
             
             <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
               <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
                 <Clock className="w-4 h-4 mr-2 text-primary-500" />
-                {dishes[activeDishIndex].preparationTime || 0} mins
+                {displayDish.preparationTime || 0} mins
               </div>
               <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
                 <Check className="w-4 h-4 mr-2 text-primary-500" />
-                {dishes[activeDishIndex].difficulty || 'N/A'}
+                {displayDish.difficulty || 'N/A'}
               </div>
             </div>
 
-            {dishes[activeDishIndex].healthBenefits && (
+            {displayDish.healthBenefits && (
               <div>
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{dishes[activeDishIndex].healthBenefits}</p>
-              </div>
-            )}
-            
-            {dishes[activeDishIndex].recipe?.ingredients && (
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{dishes[activeDishIndex].recipe.ingredients}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{displayDish.healthBenefits}</p>
               </div>
             )}
 
-            {dishes[activeDishIndex].recipe?.preparationSteps && (
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{dishes[activeDishIndex].recipe.preparationSteps}</p>
+            {isLoadingFullDish ? (
+              <div className="flex items-center gap-2 text-sm text-slate-400 py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading recipe details...
               </div>
+            ) : (
+              <>
+                {displayDish.recipe?.ingredients && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.ingredients}</p>
+                  </div>
+                )}
+
+                {displayDish.recipe?.preparationSteps && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.preparationSteps}</p>
+                  </div>
+                )}
+              </>
             )}
             
             <div className="pt-2">
               <button
-                onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
+                onClick={(e) => handleToggleSave(e, displayDish.id)}
                 className="w-full btn-secondary py-2 flex items-center justify-center gap-2"
               >
-                <Bookmark className={`w-4 h-4 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-current' : ''}`} />
-                {savedDishIds.has(dishes[activeDishIndex].id) ? 'Saved for Later' : 'Save Recipe'}
+                <Bookmark className={`w-4 h-4 ${savedDishIds.has(displayDish.id) ? 'fill-current' : ''}`} />
+                {savedDishIds.has(displayDish.id) ? 'Saved for Later' : 'Save Recipe'}
               </button>
             </div>
           </div>

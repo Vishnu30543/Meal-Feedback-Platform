@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface FavouriteDishRepository extends JpaRepository<FavouriteDish, Long> {
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"dish", "dish.images", "dish.recipe", "dish.nutrition"})
     List<FavouriteDish> findByResidentIdOrderByCreatedAtDesc(Long residentId);
 
     boolean existsByResidentIdAndDishId(Long residentId, Long dishId);

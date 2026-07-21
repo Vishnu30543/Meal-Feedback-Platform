@@ -16,6 +16,8 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+      keepalive-time: 60000
+      connection-test-query: SELECT 1
 
   jpa:
     hibernate:
@@ -26,6 +28,10 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     open-in-view: false
+
+  cache:
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=300s
 
   flyway:
     enabled: true

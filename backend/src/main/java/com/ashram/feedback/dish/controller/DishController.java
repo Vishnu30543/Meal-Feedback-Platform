@@ -130,8 +130,10 @@ public class DishController {
         return ResponseEntity.ok(ApiResponse.success("Image removed successfully"));
     }
     @GetMapping("/import-manthena")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> importManthena() {
         try {
+
             java.io.File file = new java.io.File("src/main/manthena_satyanarayana_recipes.json");
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             List<CreateDishRequest> dishes = mapper.readValue(file, new com.fasterxml.jackson.core.type.TypeReference<List<CreateDishRequest>>() {});

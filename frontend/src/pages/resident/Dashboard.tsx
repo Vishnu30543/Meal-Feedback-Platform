@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import Modal from '../../components/Modal';
@@ -14,19 +14,19 @@ export default function ResidentDashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch Progress
-  const { data: progress, isLoading: loadingProgress } = useQuery({
+  const { data: progress } = useQuery({
     queryKey: ['ratingProgress'],
     queryFn: () => api.get('/ratings/progress').then(res => res.data)
   });
 
-  // Fetch Stats
-  const { data: stats, isLoading: loadingStats } = useQuery({
+  // Fetch Stats — use data presence (not isLoading) to avoid blank-page on background refetch
+  const { data: stats } = useQuery({
     queryKey: ['residentStats'],
     queryFn: () => api.get('/analytics/resident-stats').then(res => res.data)
   });
 
   // Fetch Health Tips
-  const { data: tips, isLoading: loadingTips } = useQuery({
+  const { data: tips } = useQuery({
     queryKey: ['healthTips'],
     queryFn: () => api.get('/health-tips/today').then(res => res.data)
   });
@@ -39,7 +39,7 @@ export default function ResidentDashboard() {
   });
 
   // Fetch Saved Recipes
-  const { data: savedRecipes, isLoading: loadingSaved } = useQuery({
+  const { data: savedRecipes } = useQuery({
     queryKey: ['savedRecipes'],
     queryFn: () => api.get('/cook-later').then(res => res.data)
   });
@@ -60,9 +60,19 @@ export default function ResidentDashboard() {
     }
   });
 
-  const isLoading = loadingProgress || loadingStats || loadingTips || loadingMenu || loadingSaved;
+  const { data: fullDish, isLoading: isLoadingFullDish } = useQuery({
+    queryKey: ['dish', selectedDish?.id],
+    queryFn: () => api.get(`/dishes/${selectedDish.id}`).then(res => res.data.data),
+    enabled: !!selectedDish?.id && isModalOpen
+  });
 
-  if (isLoading) {
+  // Use fullDish when available, fall back to summary (which now includes description)
+  const displayDish = fullDish || selectedDish;
+
+  // Only show full-page spinner on the very first load (when we have NO data at all yet)
+  const isInitialLoad = loadingMenu && !menu && !progress && !stats;
+
+  if (isInitialLoad) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
@@ -130,7 +140,22 @@ export default function ResidentDashboard() {
       </div>
 
       {/* Today's Menu Display */}
-      {menu?.dishes && menu.dishes.length > 0 && (
+      {loadingMenu ? (
+        <div className="card p-6">
+          <div className="h-5 w-44 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2].map(i => (
+              <div key={i} className="card overflow-hidden bg-slate-50 dark:bg-slate-800/50">
+                <div className="h-40 bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
+                <div className="p-4 space-y-2">
+                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : menu?.dishes && menu.dishes.length > 0 && (
         <div className="card p-6">
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Utensils className="w-5 h-5 text-primary-500" />
@@ -192,7 +217,7 @@ export default function ResidentDashboard() {
             <Star className="w-6 h-6 text-amber-500" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats?.favouriteDishes || 0}</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats?.favouriteDishes ?? '–'}</p>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wide">Favourites</p>
           </div>
         </div>
@@ -201,7 +226,7 @@ export default function ResidentDashboard() {
             <Utensils className="w-6 h-6 text-blue-500" />
           </div>
           <div>
-            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats?.savedRecipes || 0}</p>
+            <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stats?.savedRecipes ?? '–'}</p>
             <p className="text-xs font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase tracking-wide">Saved</p>
           </div>
         </div>
@@ -225,59 +250,75 @@ export default function ResidentDashboard() {
     {/* Dish Details Modal */}
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={selectedDish ? (selectedDish.displayName || selectedDish.name) : "Dish Details"}
+        onClose={() => {
+          setIsModalOpen(false);
+          setTimeout(() => setSelectedDish(null), 300);
+        }}
+        title={displayDish ? (displayDish.displayName || displayDish.name) : "Dish Details"}
       >
-        {selectedDish && (
+        {!displayDish ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+          </div>
+        ) : (
           <div className="space-y-4">
-            {(selectedDish.primaryImageUrl || selectedDish.imageUrl) && (
-              <img src={selectedDish.primaryImageUrl || selectedDish.imageUrl} alt={selectedDish.name} className="w-full h-40 object-cover rounded-lg" />
+            {(displayDish.primaryImageUrl || displayDish.imageUrl) && (
+              <img src={displayDish.primaryImageUrl || displayDish.imageUrl} alt={displayDish.name} className="w-full h-40 object-cover rounded-lg" />
             )}
             
-            <p className="text-slate-600 dark:text-slate-300 text-sm">{selectedDish.description}</p>
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{displayDish.description}</p>
             
             <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
               <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
                 <Clock className="w-4 h-4 mr-2 text-primary-500" />
-                {selectedDish.preparationTime || 0} mins
+                {displayDish.preparationTime || 0} mins
               </div>
               <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
                 <Check className="w-4 h-4 mr-2 text-primary-500" />
-                {selectedDish.difficulty || 'N/A'}
+                {displayDish.difficulty || 'N/A'}
               </div>
             </div>
 
-            {selectedDish.healthBenefits && (
+            {displayDish.healthBenefits && (
               <div>
                 <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300">{selectedDish.healthBenefits}</p>
-              </div>
-            )}
-            
-            {selectedDish.recipe?.ingredients && (
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{selectedDish.recipe.ingredients}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{displayDish.healthBenefits}</p>
               </div>
             )}
 
-            {selectedDish.recipe?.preparationSteps && (
-              <div>
-                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{selectedDish.recipe.preparationSteps}</p>
+            {isLoadingFullDish ? (
+              <div className="flex items-center gap-2 text-sm text-slate-400 py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading full recipe details...
               </div>
+            ) : (
+              <>
+                {displayDish.recipe?.ingredients && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.ingredients}</p>
+                  </div>
+                )}
+
+                {displayDish.recipe?.preparationSteps && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.preparationSteps}</p>
+                  </div>
+                )}
+              </>
             )}
             
             <div className="pt-2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleSaveMutation.mutate(selectedDish.id);
+                  toggleSaveMutation.mutate(displayDish.id);
                 }}
                 className="w-full btn-secondary py-2 flex items-center justify-center gap-2"
               >
-                <Bookmark className={`w-4 h-4 ${savedDishIds.has(selectedDish.id) ? 'fill-current' : ''}`} />
-                {savedDishIds.has(selectedDish.id) ? 'Saved for Later' : 'Save Recipe'}
+                <Bookmark className={`w-4 h-4 ${savedDishIds.has(displayDish.id) ? 'fill-current' : ''}`} />
+                {savedDishIds.has(displayDish.id) ? 'Saved for Later' : 'Save Recipe'}
               </button>
             </div>
           </div>

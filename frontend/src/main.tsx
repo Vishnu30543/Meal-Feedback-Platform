@@ -10,6 +10,8 @@ import { ThemeProvider } from './context/ThemeContext';
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      staleTime: 60 * 1000,        // 1 min — serve cached data on page nav
+      gcTime: 5 * 60 * 1000,       // 5 min — keep cache in memory
       refetchOnWindowFocus: false,
       retry: 1,
     },

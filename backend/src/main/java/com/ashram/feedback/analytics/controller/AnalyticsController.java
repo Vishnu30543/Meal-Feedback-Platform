@@ -35,7 +35,7 @@ public class AnalyticsController {
     }
 
     @GetMapping("/resident-stats")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Resident food statistics")
     public ResponseEntity<ApiResponse<ResidentStatsDto>> getResidentStats(
             @AuthenticationPrincipal JwtUserPrincipal principal) {

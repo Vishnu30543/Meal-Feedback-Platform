@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface CookLaterRepository extends JpaRepository<CookLater, Long> {
 
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"dish", "dish.images", "dish.recipe", "dish.nutrition"})
     List<CookLater> findByResidentIdOrderByCreatedAtDesc(Long residentId);
 
     Optional<CookLater> findByResidentIdAndDishId(Long residentId, Long dishId);

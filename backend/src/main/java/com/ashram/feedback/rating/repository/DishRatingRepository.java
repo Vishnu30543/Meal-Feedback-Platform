@@ -27,6 +27,9 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
     @Query("SELECT AVG(dr.rating) FROM DishRating dr WHERE dr.dish.id = :dishId")
     Double getAverageRatingByDishId(@Param("dishId") Long dishId);
 
+    @Query("SELECT dr.dish.id, AVG(dr.rating) FROM DishRating dr WHERE dr.dish.id IN :dishIds GROUP BY dr.dish.id")
+    List<Object[]> findAverageRatingsForDishes(@Param("dishIds") List<Long> dishIds);
+
     @Query("SELECT AVG(dr.rating) FROM DishRating dr WHERE dr.dish.id = :dishId " +
             "AND dr.dailyMenu.menuDate BETWEEN :startDate AND :endDate")
     Double getAverageRatingByDishIdBetween(@Param("dishId") Long dishId,

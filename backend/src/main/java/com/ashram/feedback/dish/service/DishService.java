@@ -11,6 +11,8 @@ import com.ashram.feedback.dish.mapper.DishMapper;
 import com.ashram.feedback.dish.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -55,6 +57,7 @@ public class DishService {
     /**
      * Get full dish details by ID.
      */
+    @Cacheable(value = "dishById", key = "#id")
     @Transactional(readOnly = true)
     public DishDto getDishById(Long id) {
         Dish dish = findDishOrThrow(id);
@@ -74,6 +77,7 @@ public class DishService {
     /**
      * Create a new dish with all nested data.
      */
+    @CacheEvict(value = {"activeDishes", "dishById"}, allEntries = true)
     @Transactional
     public DishDto createDish(CreateDishRequest request) {
         // Generate slug
@@ -135,6 +139,7 @@ public class DishService {
     /**
      * Update an existing dish.
      */
+    @CacheEvict(value = {"activeDishes", "dishById"}, allEntries = true)
     @Transactional
     public DishDto updateDish(Long id, UpdateDishRequest request) {
         Dish dish = findDishOrThrow(id);
@@ -153,6 +158,19 @@ public class DishService {
             dish.setDisplayName(request.getName());
         }
         setAuditFields(dish, false);
+
+        // Update images
+        if (request.getImageUrls() != null) {
+            dish.getImages().clear();
+            for (int i = 0; i < request.getImageUrls().size(); i++) {
+                DishImage image = DishImage.builder()
+                        .dish(dish)
+                        .imageUrl(request.getImageUrls().get(i))
+                        .displayOrder(i)
+                        .build();
+                dish.getImages().add(image);
+            }
+        }
 
         // Update recipe
         if (request.getRecipe() != null) {
@@ -215,6 +233,7 @@ public class DishService {
     /**
      * Archive a dish (soft delete).
      */
+    @CacheEvict(value = {"activeDishes", "dishById"}, allEntries = true)
     @Transactional
     public void archiveDish(Long id) {
         Dish dish = findDishOrThrow(id);
@@ -227,6 +246,7 @@ public class DishService {
     /**
      * Restore an archived dish.
      */
+    @CacheEvict(value = {"activeDishes", "dishById"}, allEntries = true)
     @Transactional
     public void restoreDish(Long id) {
         Dish dish = findDishOrThrow(id);
@@ -296,6 +316,7 @@ public class DishService {
     /**
      * Get all active dishes by category.
      */
+    @Cacheable(value = "activeDishes", key = "#category != null ? #category.name() : 'ALL'")
     @Transactional(readOnly = true)
     public List<DishSummaryDto> getActiveDishes(DishCategory category) {
         return dishRepository.findAllActiveByCategory(category)

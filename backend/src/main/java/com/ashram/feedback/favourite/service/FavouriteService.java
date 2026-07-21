@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,13 +29,25 @@ public class FavouriteService {
      */
     @Transactional(readOnly = true)
     public List<FavouriteDishDto> getFavourites(Long residentId) {
-        return favouriteRepository.findByResidentIdOrderByCreatedAtDesc(residentId)
-                .stream()
+        List<FavouriteDish> favs = favouriteRepository.findByResidentIdOrderByCreatedAtDesc(residentId);
+
+        // Bulk-fetch all average ratings in one query to avoid N+1
+        List<Long> dishIds = favs.stream()
+                .map(fav -> fav.getDish().getId())
+                .collect(Collectors.toList());
+
+        Map<Long, Double> ratingMap = dishIds.isEmpty() ? Map.of() :
+                dishRatingRepository.findAverageRatingsForDishes(dishIds).stream()
+                        .collect(Collectors.toMap(
+                                row -> (Long) row[0],
+                                row -> (Double) row[1]
+                        ));
+
+        return favs.stream()
                 .map(fav -> FavouriteDishDto.builder()
                         .id(fav.getId())
                         .dish(dishMapper.toSummaryDto(fav.getDish()))
-                        .averageRating(dishRatingRepository
-                                .getAverageRatingByDishId(fav.getDish().getId()))
+                        .averageRating(ratingMap.get(fav.getDish().getId()))
                         .createdAt(fav.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());

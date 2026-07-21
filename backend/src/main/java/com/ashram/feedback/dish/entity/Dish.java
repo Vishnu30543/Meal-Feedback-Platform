@@ -5,7 +5,6 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class Dish {
     @Column(name = "updated_by")
     private Long updatedBy;
 
-    @Formula("(SELECT AVG(dr.rating) FROM dish_ratings dr WHERE dr.dish_id = id)")
+    @Transient
     private Double averageRating;
 
     // === Relationships ===

@@ -42,7 +42,6 @@ public class SecurityConfig {
                         // Admin-only endpoints
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/residents/manage/**").hasRole("ADMIN")
-                        .requestMatchers("/api/analytics/**").hasRole("ADMIN")
                         .requestMatchers("/api/ai-settings/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/dishes/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/dishes/**").hasRole("ADMIN")

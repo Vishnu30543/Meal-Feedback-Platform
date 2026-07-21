@@ -1,12 +1,26 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Utensils, Clock, ExternalLink } from 'lucide-react';
+import { Utensils, Clock, ExternalLink, Loader2 } from 'lucide-react';
+import Modal from '../../components/Modal';
 
 export default function SavedRecipes() {
+  const [selectedDish, setSelectedDish] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: saved, isLoading } = useQuery({
     queryKey: ['savedRecipes'],
     queryFn: () => api.get('/cook-later').then(res => res.data)
   });
+
+  const { data: fullDish, isLoading: isLoadingFullDish } = useQuery({
+    queryKey: ['dish', selectedDish?.id],
+    queryFn: () => api.get(`/dishes/${selectedDish.id}`).then(res => res.data.data),
+    enabled: !!selectedDish?.id && isModalOpen
+  });
+
+  // Fall back to summary (which now has description, difficulty, healthBenefits)
+  const displayDish = fullDish || selectedDish;
 
   if (isLoading) return <div className="text-center py-10">Loading Saved Recipes...</div>;
 
@@ -30,7 +44,7 @@ export default function SavedRecipes() {
           {saved?.map((item: any) => (
             <div key={item.id} className="card overflow-hidden">
               <div className="h-32 bg-slate-100 dark:bg-slate-800 relative">
-                {item.dish.imageUrl && <img src={item.dish.imageUrl} alt={item.dish.name} className="w-full h-full object-cover" />}
+                {(item.dish.primaryImageUrl || item.dish.imageUrl) && <img src={item.dish.primaryImageUrl || item.dish.imageUrl} alt={item.dish.name} className="w-full h-full object-cover" />}
                 {!item.hasRecipe && (
                   <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center backdrop-blur-[2px]">
                     <span className="bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-xs font-bold px-3 py-1 rounded-full">Recipe Coming Soon</span>
@@ -50,6 +64,10 @@ export default function SavedRecipes() {
                 
                 <button 
                   disabled={!item.hasRecipe}
+                  onClick={() => {
+                    setSelectedDish(item.dish);
+                    setIsModalOpen(true);
+                  }}
                   className="w-full btn-secondary text-sm flex justify-center items-center py-2"
                 >
                   View Recipe <ExternalLink className="w-3 h-3 ml-2" />
@@ -59,6 +77,71 @@ export default function SavedRecipes() {
           ))}
         </div>
       )}
+
+      {/* Dish Details Modal */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setTimeout(() => setSelectedDish(null), 300);
+        }}
+        title={displayDish ? (displayDish.displayName || displayDish.name) : "Recipe Details"}
+      >
+        {!displayDish ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 text-primary-500 animate-spin" />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {(displayDish.primaryImageUrl || displayDish.imageUrl) && (
+              <img src={displayDish.primaryImageUrl || displayDish.imageUrl} alt={displayDish.name} className="w-full h-40 object-cover rounded-lg" />
+            )}
+            
+            <p className="text-slate-600 dark:text-slate-300 text-sm">{displayDish.description}</p>
+            
+            <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Clock className="w-4 h-4 mr-2 text-primary-500" />
+                {displayDish.preparationTime || 0} mins
+              </div>
+              <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
+                <Utensils className="w-4 h-4 mr-2 text-primary-500" />
+                {displayDish.difficulty || 'N/A'}
+              </div>
+            </div>
+
+            {displayDish.healthBenefits && (
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Health Benefits</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300">{displayDish.healthBenefits}</p>
+              </div>
+            )}
+
+            {isLoadingFullDish ? (
+              <div className="flex items-center gap-2 text-sm text-slate-400 py-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading recipe details...
+              </div>
+            ) : (
+              <>
+                {displayDish.recipe?.ingredients && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Ingredients</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.ingredients}</p>
+                  </div>
+                )}
+
+                {displayDish.recipe?.preparationSteps && (
+                  <div>
+                    <h3 className="font-bold text-slate-800 dark:text-slate-100 mb-1">Preparation Steps</h3>
+                    <p className="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-wrap">{displayDish.recipe.preparationSteps}</p>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -2,6 +2,7 @@ package com.ashram.feedback.dish.dto;
 
 import com.ashram.feedback.dish.entity.DishCategory;
 import com.ashram.feedback.dish.entity.DishStatus;
+import com.ashram.feedback.dish.entity.Difficulty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +19,12 @@ public class DishSummaryDto {
     private String displayName;
     private String slug;
     private DishCategory category;
+    private String description;
     private String primaryImageUrl;
     private Double averageRating;
     private Integer preparationTime;
+    private Difficulty difficulty;
+    private String healthBenefits;
     private DishStatus status;
     private boolean hasRecipe;
     private boolean hasNutrition;

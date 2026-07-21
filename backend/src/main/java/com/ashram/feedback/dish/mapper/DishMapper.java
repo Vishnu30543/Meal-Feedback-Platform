@@ -10,6 +10,7 @@ import java.util.List;
 public interface DishMapper {
 
     @Mapping(target = "images", source = "images")
+    @Mapping(target = "primaryImageUrl", expression = "java(dish.getPrimaryImageUrl())")
     @Mapping(target = "recipe", source = "recipe")
     @Mapping(target = "nutrition", source = "nutrition")
     @Mapping(target = "allergen", source = "allergen")
@@ -18,6 +19,9 @@ public interface DishMapper {
     @Mapping(target = "primaryImageUrl", expression = "java(dish.getPrimaryImageUrl())")
     @Mapping(target = "hasRecipe", expression = "java(dish.getRecipe() != null)")
     @Mapping(target = "hasNutrition", expression = "java(dish.getNutrition() != null)")
+    @Mapping(target = "description", source = "description")
+    @Mapping(target = "difficulty", source = "difficulty")
+    @Mapping(target = "healthBenefits", source = "healthBenefits")
     DishSummaryDto toSummaryDto(Dish dish);
 
     DishImageDto toImageDto(DishImage image);

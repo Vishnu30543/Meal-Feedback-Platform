@@ -9,7 +9,7 @@
     "healthBenefits": "High in protein and lycopene. Excellent for heart health and blood pressure regulation.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+tomato+dal",
     "imageUrls": [
-      "https://example.com/images/tomato-dal-1.jpg"
+      "/images/dishes/oil-free-tomato-dal.png"
     ],
     "recipe": {
       "ingredients": "- 1 cup Toor Dal (Pigeon peas)\n- 3 medium tomatoes, chopped\n- 4 green chilies, slit (adjust for spice, as no salt is used)\n- 1/4 tsp turmeric powder\n- 1 tsp mustard seeds\n- 1 tsp cumin seeds\n- A sprig of curry leaves\n- Fresh coriander for garnish",
@@ -47,7 +47,7 @@
     "healthBenefits": "Extremely hydrating, aids in weight loss, and promotes urinary tract health.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+bottle+gourd+curry",
     "imageUrls": [
-      "https://example.com/images/bottle-gourd-1.jpg"
+      "/images/dishes/bottle-gourd-curry.png"
     ],
     "recipe": {
       "ingredients": "- 2 cups bottle gourd (sorakaya), peeled and cubed\n- 1 onion, finely chopped\n- 3 green chilies, paste\n- 2 tbsp fresh grated coconut\n- 1/2 tsp cumin powder\n- 1/4 tsp turmeric\n- Coriander leaves",
@@ -85,7 +85,7 @@
     "healthBenefits": "Packed with live enzymes, vitamins, and high biological value protein.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sprouts",
     "imageUrls": [
-      "https://example.com/images/sprouts-salad.jpg"
+      "/images/dishes/mixed-sprouts-salad.png"
     ],
     "recipe": {
       "ingredients": "- 1 cup moong bean sprouts\n- 1/2 cup chickpea sprouts\n- 1/4 cup pomegranate seeds\n- 1/2 onion, finely chopped\n- 1 tomato, finely chopped\n- 1/2 cucumber, diced\n- 1 tbsp lemon juice\n- 1/2 tsp freshly ground black pepper\n- 1 tsp honey (optional)",
@@ -123,7 +123,7 @@
     "healthBenefits": "Excellent source of resistant starch and potassium. Good for gut bacteria.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+raw+banana",
     "imageUrls": [
-      "https://example.com/images/raw-banana.jpg"
+      "/images/dishes/raw-banana-curry.png"
     ],
     "recipe": {
       "ingredients": "- 2 raw bananas (green plantains)\n- 2 tbsp roasted sesame seed powder\n- 1 tsp coriander powder\n- 1/2 tsp ginger-green chili paste\n- 1/2 tsp mustard seeds\n- Curry leaves",
@@ -161,7 +161,7 @@
     "healthBenefits": "Instant energy booster, rich in iron, healthy fats, and antioxidants.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+sweet",
     "imageUrls": [
-      "https://example.com/images/dates-laddu.jpg"
+      "/images/dishes/dates-and-nuts-laddu.png"
     ],
     "recipe": {
       "ingredients": "- 2 cups soft dates (seedless)\n- 1/2 cup almonds\n- 1/2 cup walnuts\n- 1/4 cup cashews\n- 2 tbsp pumpkin seeds\n- 1/2 tsp cardamom powder",
@@ -199,7 +199,7 @@
     "healthBenefits": "High water content and fiber, aids in purifying blood and improving digestion.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ridge+gourd",
     "imageUrls": [
-      "https://example.com/images/ridge-gourd.jpg"
+      "/images/dishes/ridge-gourd-curry.png"
     ],
     "recipe": {
       "ingredients": "- 2 cups peeled and chopped ridge gourd (beerakaya)\n- 1 tomato, chopped\n- 2 tbsp roasted peanut powder\n- 2 green chilies, slit\n- 1/4 tsp turmeric\n- Fresh coriander",
@@ -237,7 +237,7 @@
     "healthBenefits": "Moringa leaves are a superfood, incredibly rich in iron, calcium, and Vitamin A.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+munagaku",
     "imageUrls": [
-      "https://example.com/images/munagaku-dal.jpg"
+      "/images/dishes/drumstick-leaves-dal.png"
     ],
     "recipe": {
       "ingredients": "- 1 cup Moong dal (Yellow lentils)\n- 2 cups fresh drumstick leaves (Moringa/Munagaku), washed and separated from stems\n- 1 onion, chopped\n- 3-4 green chilies\n- 4 cloves garlic, crushed\n- 1/4 tsp turmeric\n- 1 tsp cumin seeds",
@@ -275,7 +275,7 @@
     "healthBenefits": "High in beta-carotene and natural nitrates. Great for skin, eyes, and blood circulation.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+carrot+beetroot",
     "imageUrls": [
-      "https://example.com/images/carrot-beet-1.jpg"
+      "/images/dishes/carrot-beetroot-fry.png"
     ],
     "recipe": {
       "ingredients": "- 1 cup grated carrots\n- 1 cup grated beetroot\n- 2 tbsp fresh grated coconut\n- 2 green chilies, finely chopped\n- 1/2 tsp cumin seeds\n- Curry leaves\n- 1 tsp lemon juice",
@@ -313,7 +313,7 @@
     "healthBenefits": "Provides complex carbohydrates and fiber for sustained energy release. Good for diabetics.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+brown+rice",
     "imageUrls": [
-      "https://example.com/images/brown-rice-pulao.jpg"
+      "/images/dishes/brown-rice-vegetable-pulao.png"
     ],
     "recipe": {
       "ingredients": "- 1 cup soaked brown rice (soaked for 2 hours)\n- 1.5 cups mixed chopped vegetables (beans, carrots, peas, cauliflower)\n- 1 onion, thinly sliced\n- 1 tsp ginger-garlic paste\n- 2 cloves, 1 inch cinnamon, 1 cardamom, 1 bay leaf\n- 3 green chilies, slit\n- 1/2 cup fresh mint and coriander leaves",
@@ -351,7 +351,7 @@
     "healthBenefits": "Exceptionally high in natural calcium. Cools the body and acts as a great morning energy booster.",
     "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ragi+malt",
     "imageUrls": [
-      "https://example.com/images/ragi-malt.jpg"
+      "/images/dishes/ragi-malt.png"
     ],
     "recipe": {
       "ingredients": "- 2 tbsp Ragi (Finger Millet) flour\n- 2 cups water\n- 1 tbsp finely chopped raw onions\n- 1 green chili, very finely chopped\n- 1 tbsp lemon juice\n- Fresh coriander leaves",

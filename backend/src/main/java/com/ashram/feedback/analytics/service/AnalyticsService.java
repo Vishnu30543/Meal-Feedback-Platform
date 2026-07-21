@@ -196,26 +196,33 @@ public class AnalyticsService {
     }
 
     private List<TopDishDto> buildTopDishList(List<Object[]> results, String valueType) {
+        // Collect all dish IDs first to avoid N+1 queries
+        List<Long> dishIds = results.stream()
+                .map(row -> (Long) row[0])
+                .collect(Collectors.toList());
+
+        Map<Long, Dish> dishMap = dishRepository.findAllById(dishIds).stream()
+                .collect(Collectors.toMap(Dish::getId, d -> d));
+
         return results.stream()
                 .map(row -> {
                     Long dishId = (Long) row[0];
                     Number value = (Number) row[1];
-                    return dishRepository.findById(dishId)
-                            .map(dish -> {
-                                TopDishDto.TopDishDtoBuilder builder = TopDishDto.builder()
-                                        .dishId(dish.getId())
-                                        .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName());
-                                if ("avg".equals(valueType)) {
-                                    builder.averageRating(Math.round(value.doubleValue() * 10.0) / 10.0);
-                                } else {
-                                    builder.ratingCount(value.longValue());
-                                }
-                                builder.servedCount(menuDishRepository.countMenusContainingDish(dishId));
-                                builder.savedCount(cookLaterRepository.countByDishId(dishId));
-                                builder.favouriteCount(favouriteRepository.countByDishId(dishId));
-                                return builder.build();
-                            })
-                            .orElse(null);
+                    Dish dish = dishMap.get(dishId);
+                    if (dish == null) return null;
+
+                    TopDishDto.TopDishDtoBuilder builder = TopDishDto.builder()
+                            .dishId(dish.getId())
+                            .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName());
+                    if ("avg".equals(valueType)) {
+                        builder.averageRating(Math.round(value.doubleValue() * 10.0) / 10.0);
+                    } else {
+                        builder.ratingCount(value.longValue());
+                    }
+                    builder.servedCount(menuDishRepository.countMenusContainingDish(dishId));
+                    builder.savedCount(cookLaterRepository.countByDishId(dishId));
+                    builder.favouriteCount(favouriteRepository.countByDishId(dishId));
+                    return builder.build();
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

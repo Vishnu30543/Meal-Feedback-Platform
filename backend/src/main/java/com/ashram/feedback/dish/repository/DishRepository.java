@@ -5,6 +5,7 @@ import com.ashram.feedback.dish.entity.DishCategory;
 import com.ashram.feedback.dish.entity.DishStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,10 +17,14 @@ import java.util.Optional;
 @Repository
 public interface DishRepository extends JpaRepository<Dish, Long> {
 
+    @EntityGraph(attributePaths = {"images", "recipe", "nutrition", "allergen"})
+    Optional<Dish> findById(Long id);
+
     Optional<Dish> findBySlug(String slug);
 
     boolean existsBySlug(String slug);
 
+    @EntityGraph(attributePaths = {"images", "recipe", "nutrition"})
     @Query("SELECT d FROM Dish d WHERE d.status = :status " +
             "AND (:search IS NULL OR :search = '' OR " +
             "LOWER(d.name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -30,6 +35,7 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
                             @Param("status") DishStatus status,
                             Pageable pageable);
 
+    @EntityGraph(attributePaths = {"images", "recipe", "nutrition"})
     @Query("SELECT d FROM Dish d WHERE d.status = 'ACTIVE' " +
             "AND (:category IS NULL OR d.category = :category)")
     List<Dish> findAllActiveByCategory(@Param("category") DishCategory category);

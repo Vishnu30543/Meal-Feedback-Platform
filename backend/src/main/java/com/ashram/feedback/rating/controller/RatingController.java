@@ -23,7 +23,7 @@ public class RatingController {
     private final RatingService ratingService;
 
     @PostMapping("/menu/{menuId}")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Submit ratings", description = "Submit or update dish and overall ratings for a menu")
     public ResponseEntity<ApiResponse<Void>> submitRatings(
             @PathVariable Long menuId,
@@ -34,7 +34,7 @@ public class RatingController {
     }
 
     @GetMapping("/menu/{menuId}")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Get my ratings", description = "Get my ratings for a specific menu")
     public ResponseEntity<ApiResponse<SubmitRatingsRequest>> getMyRatings(
             @PathVariable Long menuId,
@@ -44,7 +44,7 @@ public class RatingController {
     }
 
     @GetMapping("/progress")
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Get rating progress",
             description = "Get today's rating progress (e.g., 6/8 dishes rated)")
     public ResponseEntity<ApiResponse<RatingProgressDto>> getRatingProgress(

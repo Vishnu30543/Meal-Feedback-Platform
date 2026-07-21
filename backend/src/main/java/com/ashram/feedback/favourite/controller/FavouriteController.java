@@ -25,7 +25,7 @@ public class FavouriteController {
     private final FavouriteService favouriteService;
 
     @GetMapping
-    @PreAuthorize("hasRole('RESIDENT')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Get my favourites",
             description = "Auto-calculated from highest-rated dishes")
     public ResponseEntity<ApiResponse<List<FavouriteDishDto>>> getMyFavourites(
