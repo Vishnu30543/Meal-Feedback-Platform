@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Search, Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Search, Plus, Edit2, Trash2, Image as ImageIcon, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Dishes() {
@@ -132,6 +132,13 @@ export default function Dishes() {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <Link
+                          to={`/admin/analytics/dishes/${dish.id}`}
+                          className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"
+                          title="View Analytics"
+                        >
+                          <TrendingUp className="w-4 h-4" />
+                        </Link>
                         <Link 
                           to={`/admin/dishes/${dish.id}`}
                           className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-primary-600 transition-colors rounded-lg hover:bg-primary-50"

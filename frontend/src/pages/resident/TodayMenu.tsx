@@ -12,7 +12,7 @@ export default function TodayMenu() {
   const queryClient = useQueryClient();
   const [activeDishIndex, setActiveDishIndex] = useState(0);
   const [ratings, setRatings] = useState<Record<number, { rating: number, comment: string }>>({});
-  
+
   const [overallRating, setOverallRating] = useState<number>(0);
   const [overallComment, setOverallComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +54,9 @@ export default function TodayMenu() {
   });
 
   const dishes = menu?.dishes?.map((md: any) => md.dish) || [];
+  
+  const isLastDish = activeDishIndex === dishes.length - 1;
+  const isOverallStep = activeDishIndex === dishes.length;
 
   const { data: fullDish, isLoading: isLoadingFullDish } = useQuery({
     queryKey: ['dish', !isOverallStep && dishes[activeDishIndex]?.id],
@@ -101,7 +104,7 @@ export default function TodayMenu() {
       }
 
       await api.post(`/ratings/menu/${menu.id}`, payload);
-      
+
       queryClient.invalidateQueries({ queryKey: ['ratingProgress'] });
       setIsSuccess(true);
       setTimeout(() => {
@@ -132,7 +135,7 @@ export default function TodayMenu() {
         >
           <CheckCircle className="w-12 h-12 text-green-600" />
         </motion.div>
-        <motion.h2 
+        <motion.h2
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -140,7 +143,7 @@ export default function TodayMenu() {
         >
           Thank You!
         </motion.h2>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -151,9 +154,6 @@ export default function TodayMenu() {
       </div>
     );
   }
-
-  const isLastDish = activeDishIndex === dishes.length - 1;
-  const isOverallStep = activeDishIndex === dishes.length;
 
   return (
     <div className="space-y-6">
@@ -170,12 +170,11 @@ export default function TodayMenu() {
       <div className="flex justify-between items-center px-2">
         <div className="flex gap-1">
           {Array.from({ length: dishes.length + 1 }).map((_, idx) => (
-            <div 
-              key={idx} 
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                idx === activeDishIndex ? 'w-6 bg-primary-600' : 
-                idx < activeDishIndex ? 'w-3 bg-primary-300' : 'w-3 bg-slate-200'
-              }`} 
+            <div
+              key={idx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeDishIndex ? 'w-6 bg-primary-600' :
+                  idx < activeDishIndex ? 'w-3 bg-primary-300' : 'w-3 bg-slate-200'
+                }`}
             />
           ))}
         </div>
@@ -197,26 +196,26 @@ export default function TodayMenu() {
             >
               {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) && (
                 <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative">
-                  <img 
-                    src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl} 
+                  <img
+                    src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl}
                     alt={dishes[activeDishIndex].name}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute top-3 left-3 bg-white dark:bg-slate-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm">
                     {dishes[activeDishIndex].category}
                   </div>
-                  <button 
+                  <button
                     onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
                     className="absolute top-3 right-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:scale-110 transition-transform"
                     title={savedDishIds.has(dishes[activeDishIndex].id) ? "Remove from saved" : "Save for later"}
                   >
-                    <Bookmark 
-                      className={`w-5 h-5 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`} 
+                    <Bookmark
+                      className={`w-5 h-5 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`}
                     />
                   </button>
                 </div>
               )}
-              
+
               <div className="p-6">
                 <div className="flex justify-between items-start mb-1">
                   <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}</h2>
@@ -237,11 +236,10 @@ export default function TodayMenu() {
                       <button
                         key={star}
                         onClick={() => handleRatingChange(dishes[activeDishIndex].id, star)}
-                        className={`p-2 transition-transform hover:scale-110 ${
-                          (ratings[dishes[activeDishIndex].id]?.rating || 0) >= star 
-                            ? 'text-amber-400' 
+                        className={`p-2 transition-transform hover:scale-110 ${(ratings[dishes[activeDishIndex].id]?.rating || 0) >= star
+                            ? 'text-amber-400'
                             : 'text-slate-200'
-                        }`}
+                          }`}
                       >
                         <Star className="w-10 h-10 fill-current" />
                       </button>
@@ -251,7 +249,7 @@ export default function TodayMenu() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Any comments? (Optional)</label>
-                  <textarea 
+                  <textarea
                     className="input-field min-h-[80px] resize-none"
                     placeholder="E.g., A bit too spicy, perfect consistency..."
                     value={ratings[dishes[activeDishIndex].id]?.comment || ''}
@@ -282,23 +280,22 @@ export default function TodayMenu() {
                   <button
                     key={star}
                     onClick={() => setOverallRating(star)}
-                    className={`p-2 transition-transform hover:scale-110 ${
-                      overallRating >= star ? 'text-amber-400' : 'text-slate-200'
-                    }`}
+                    className={`p-2 transition-transform hover:scale-110 ${overallRating >= star ? 'text-amber-400' : 'text-slate-200'
+                      }`}
                   >
                     <Star className="w-12 h-12 fill-current" />
                   </button>
                 ))}
               </div>
 
-              <textarea 
+              <textarea
                 className="input-field min-h-[100px] resize-none mb-6 text-left"
                 placeholder="Overall comments about today's meal..."
                 value={overallComment}
                 onChange={(e) => setOverallComment(e.target.value)}
               />
 
-              <button 
+              <button
                 onClick={submitRatings}
                 disabled={isSubmitting}
                 className="btn-primary w-full py-4 text-lg font-bold flex justify-center items-center"
@@ -314,14 +311,14 @@ export default function TodayMenu() {
 
       {!isOverallStep && (
         <div className="flex justify-between gap-4 mt-6">
-          <button 
+          <button
             onClick={() => setActiveDishIndex(p => Math.max(0, p - 1))}
             disabled={activeDishIndex === 0}
             className="btn-secondary flex-1 py-3"
           >
             Previous
           </button>
-          <button 
+          <button
             onClick={() => setActiveDishIndex(p => p + 1)}
             className="btn-primary flex-1 py-3"
           >
@@ -340,9 +337,9 @@ export default function TodayMenu() {
             {(displayDish.primaryImageUrl || displayDish.imageUrl) && (
               <img src={displayDish.primaryImageUrl || displayDish.imageUrl} alt={displayDish.name} className="w-full h-40 object-cover rounded-lg" />
             )}
-            
+
             <p className="text-slate-600 dark:text-slate-300 text-sm">{displayDish.description}</p>
-            
+
             <div className="flex gap-4 border-y border-slate-100 dark:border-slate-800 py-3">
               <div className="flex items-center text-sm font-medium text-slate-700 dark:text-slate-200">
                 <Clock className="w-4 h-4 mr-2 text-primary-500" />
@@ -383,7 +380,7 @@ export default function TodayMenu() {
                 )}
               </>
             )}
-            
+
             <div className="pt-2">
               <button
                 onClick={(e) => handleToggleSave(e, displayDish.id)}

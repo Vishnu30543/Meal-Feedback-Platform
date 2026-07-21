@@ -46,7 +46,7 @@ export default function ResidentLayout() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
-            
+
             return (
               <Link
                 key={item.name}
@@ -57,7 +57,7 @@ export default function ResidentLayout() {
                 <span className={`text-[10px] sm:text-sm font-medium mt-1 sm:mt-0 ${isActive ? 'text-primary-700 dark:text-primary-400' : ''}`}>
                   {item.name}
                 </span>
-                
+
                 {/* Active Indicator Line */}
                 {isActive && (
                   <motion.div

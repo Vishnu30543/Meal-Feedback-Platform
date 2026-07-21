@@ -29,9 +29,27 @@ public class AnalyticsController {
 
     @GetMapping("/dashboard")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Admin dashboard stats")
+    @Operation(summary = "Admin dashboard stats — 7 key metrics")
     public ResponseEntity<ApiResponse<DashboardStatsDto>> getDashboardStats() {
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getDashboardStats()));
+    }
+
+    @GetMapping("/feedback-status/today")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Today's Feedback Status table",
+            description = "Per-resident submission status for today's menu (Submitted / Partial / Pending)")
+    public ResponseEntity<ApiResponse<List<AdminFeedbackStatusDto>>> getTodayFeedbackStatus() {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getTodayFeedbackStatus()));
+    }
+
+    @GetMapping("/daily-trends")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Daily trends for dashboard metrics",
+            description = "Get day-wise breakdown of residents present, rated, pending, completion %, avg overall rating, avg dish rating")
+    public ResponseEntity<ApiResponse<List<DailyTrendDto>>> getDailyTrends(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getDailyTrends(startDate, endDate)));
     }
 
     @GetMapping("/resident-stats")
@@ -63,7 +81,8 @@ public class AnalyticsController {
 
     @GetMapping("/top-dishes")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Top dishes by metric", description = "metric: TOP_RATED, MOST_RATED, MOST_SAVED, MOST_FAVOURITED")
+    @Operation(summary = "Top dishes by metric",
+            description = "metric: TOP_RATED | MOST_RATED | MOST_SAVED | MOST_FAVOURITED")
     public ResponseEntity<ApiResponse<List<TopDishDto>>> getTopDishes(
             @RequestParam(defaultValue = "TOP_RATED") String metric,
             @RequestParam(defaultValue = "10") int limit) {
@@ -84,6 +103,32 @@ public class AnalyticsController {
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getDishRatingDistribution(dishId)));
     }
 
+    /**
+     * Full Dish Analytics page — overview, monthly trend, distribution, comments, top phrases.
+     */
+    @GetMapping("/dish/{dishId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Full dish analytics",
+            description = "Complete analytics for a single dish: overview, monthly trend, distribution, latest comments, most used phrases")
+    public ResponseEntity<ApiResponse<DishAnalyticsDto>> getDishAnalytics(@PathVariable Long dishId) {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getDishAnalytics(dishId)));
+    }
+
+    /**
+     * Dish Comparison — up to 3 dishes side-by-side.
+     */
+    @GetMapping("/dish/compare")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Compare multiple dishes",
+            description = "Compare 1–3 dishes across: avg rating, number of ratings, times served, Cook Later saves, last served date")
+    public ResponseEntity<ApiResponse<List<DishComparisonDto>>> compareDishes(
+            @RequestParam List<Long> dishIds) {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.compareDishes(dishIds)));
+    }
+
+    /**
+     * Comment keyword search.
+     */
     @GetMapping("/comments/search")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Search comments by keyword")
@@ -95,6 +140,9 @@ public class AnalyticsController {
                 dishRatingRepository.searchComments(q, PageRequest.of(page, size))));
     }
 
+    /**
+     * Recent comments feed.
+     */
     @GetMapping("/recent-comments")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Recent comments")

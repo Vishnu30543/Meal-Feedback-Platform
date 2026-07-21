@@ -9,7 +9,9 @@ public class DashboardStatsDto {
     private long residentsRatedToday;
     private long totalResidents;
     private Double overallSatisfaction;
-    private long pendingRatings;
+    private Double averageDishRating;
+    private long pendingFeedback;
+    private Double completionPercentage;
     private TopDishDto todayTopRated;
     private TopDishDto todayLowestRated;
     private long totalDishes;

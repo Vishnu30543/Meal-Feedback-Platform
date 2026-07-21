@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -157,6 +158,89 @@ public class RatingService {
                 .overallRated(overallRated)
                 .editable(isEditable(todayMenu.getMenuDate()))
                 .build();
+    }
+
+    /**
+     * Get full rating history for a resident, grouped by menu date.
+     * Supports filtering by dish name, min rating, category, and date range.
+     */
+    @Transactional(readOnly = true)
+    public List<RatingHistoryDto> getRatingHistory(
+            Long residentId,
+            String dishName,
+            Integer minRating,
+            String category,
+            LocalDate startDate,
+            LocalDate endDate) {
+
+        // Determine sort order for quality filters
+        List<DishRating> allDishRatings = dishRatingRepository.findHistoryByFilters(
+                residentId, dishName, minRating, category, startDate, endDate);
+
+        // Fetch overall ratings for the matching date range
+        List<OverallLunchRating> overallRatings = overallRatingRepository
+                .findByResidentIdWithDateRange(residentId, startDate, endDate);
+
+        // Group overall ratings by menuId
+        Map<Long, OverallLunchRating> overallByMenuId = overallRatings.stream()
+                .collect(Collectors.toMap(o -> o.getDailyMenu().getId(), o -> o, (a, b) -> a));
+
+        // Group dish ratings by menuId, preserving date ordering
+        Map<Long, List<DishRating>> dishRatingsByMenuId = new LinkedHashMap<>();
+        for (DishRating dr : allDishRatings) {
+            dishRatingsByMenuId
+                    .computeIfAbsent(dr.getDailyMenu().getId(), k -> new ArrayList<>())
+                    .add(dr);
+        }
+
+        // Collect all menuIds we need to include (union of dish and overall)
+        Set<Long> allMenuIds = new LinkedHashSet<>(dishRatingsByMenuId.keySet());
+        overallByMenuId.keySet().forEach(allMenuIds::add);
+
+        // Build final DTOs, sorted by menu date descending
+        List<RatingHistoryDto> result = new ArrayList<>();
+        for (Long menuId : allMenuIds) {
+            List<DishRating> drs = dishRatingsByMenuId.getOrDefault(menuId, Collections.emptyList());
+            OverallLunchRating overall = overallByMenuId.get(menuId);
+
+            // Skip entries that have neither a dish rating (after filter) nor overall
+            if (drs.isEmpty() && overall == null) continue;
+
+            LocalDate menuDate = drs.isEmpty()
+                    ? overall.getDailyMenu().getMenuDate()
+                    : drs.get(0).getDailyMenu().getMenuDate();
+
+            List<RatingHistoryDto.DishEntry> dishEntries = drs.stream()
+                    .map(dr -> RatingHistoryDto.DishEntry.builder()
+                            .dishId(dr.getDish().getId())
+                            .dishName(dr.getDish().getDisplayName() != null
+                                    ? dr.getDish().getDisplayName() : dr.getDish().getName())
+                            .dishCategory(dr.getDish().getCategory() != null
+                                    ? dr.getDish().getCategory().name() : null)
+                            .rating(dr.getRating())
+                            .comment(dr.getComment())
+                            .build())
+                    .collect(Collectors.toList());
+
+            RatingHistoryDto.OverallEntry overallEntry = (overall != null)
+                    ? RatingHistoryDto.OverallEntry.builder()
+                            .rating(overall.getRating())
+                            .comment(overall.getComment())
+                            .build()
+                    : null;
+
+            result.add(RatingHistoryDto.builder()
+                    .menuId(menuId)
+                    .menuDate(menuDate)
+                    .overallRating(overallEntry)
+                    .dishRatings(dishEntries)
+                    .editable(isEditable(menuDate))
+                    .build());
+        }
+
+        // Sort by date descending (most recent first)
+        result.sort((a, b) -> b.getMenuDate().compareTo(a.getMenuDate()));
+        return result;
     }
 
     /**

@@ -10,6 +10,7 @@ const AuthLayout = lazy(() => import('./layouts/AuthLayout'));
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const ResidentLogin = lazy(() => import('./pages/auth/ResidentLogin'));
 
+// Admin pages
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminResidents = lazy(() => import('./pages/admin/Residents'));
 const AdminDishes = lazy(() => import('./pages/admin/Dishes'));
@@ -18,10 +19,17 @@ const AdminMenus = lazy(() => import('./pages/admin/Menus'));
 const AdminAnnouncements = lazy(() => import('./pages/admin/Announcements'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
 
+// Admin Analytics pages
+const DishAnalytics = lazy(() => import('./pages/admin/DishAnalytics'));
+const DishComparison = lazy(() => import('./pages/admin/DishComparison'));
+const FeedbackSearch = lazy(() => import('./pages/admin/FeedbackSearch'));
+
+// Resident pages
 const ResidentDashboard = lazy(() => import('./pages/resident/Dashboard'));
 const ResidentTodayMenu = lazy(() => import('./pages/resident/TodayMenu'));
 const ResidentFavourites = lazy(() => import('./pages/resident/Favourites'));
 const ResidentSavedRecipes = lazy(() => import('./pages/resident/SavedRecipes'));
+const ResidentHistory = lazy(() => import('./pages/resident/History'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -62,6 +70,12 @@ function App() {
           <Route path="menus" element={<AdminMenus />} />
           <Route path="announcements" element={<AdminAnnouncements />} />
           <Route path="settings" element={<AdminSettings />} />
+
+          {/* Analytics Routes */}
+          <Route path="analytics" element={<AdminDashboard />} />
+          <Route path="analytics/dishes/:dishId" element={<DishAnalytics />} />
+          <Route path="analytics/comparison" element={<DishComparison />} />
+          <Route path="analytics/search" element={<FeedbackSearch />} />
         </Route>
 
         {/* Resident Routes */}
@@ -72,6 +86,7 @@ function App() {
           <Route path="menu/today" element={<ResidentTodayMenu />} />
           <Route path="favourites" element={<ResidentFavourites />} />
           <Route path="saved" element={<ResidentSavedRecipes />} />
+          <Route path="history" element={<ResidentHistory />} />
         </Route>
 
         {/* Default Redirect */}

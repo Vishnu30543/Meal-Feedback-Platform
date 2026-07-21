@@ -25,5 +25,6 @@ public interface ResidentMapper {
     @Mapping(target = "camps", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "archived", ignore = true)
     Resident toEntity(CreateResidentRequest request);
 }

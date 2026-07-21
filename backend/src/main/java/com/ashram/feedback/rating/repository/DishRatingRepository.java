@@ -24,6 +24,8 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
 
     long countByResidentId(Long residentId);
 
+    long countByDishId(Long dishId);
+
     @Query("SELECT AVG(dr.rating) FROM DishRating dr WHERE dr.dish.id = :dishId")
     Double getAverageRatingByDishId(@Param("dishId") Long dishId);
 
@@ -59,4 +61,46 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
     @Query("SELECT dr.rating, COUNT(dr) FROM DishRating dr " +
             "WHERE dr.dish.id = :dishId GROUP BY dr.rating ORDER BY dr.rating")
     List<Object[]> getRatingDistributionByDish(@Param("dishId") Long dishId);
+
+    /** Latest comments for a specific dish, most recent first */
+    @Query("SELECT dr FROM DishRating dr WHERE dr.dish.id = :dishId ORDER BY dr.createdAt DESC")
+    Page<DishRating> findLatestCommentsByDish(@Param("dishId") Long dishId, Pageable pageable);
+
+    /** All comments for a dish (for phrase frequency analysis) */
+    @Query("SELECT dr.comment FROM DishRating dr WHERE dr.dish.id = :dishId")
+    List<String> findAllCommentsByDish(@Param("dishId") Long dishId);
+
+    /** Average overall dish rating across all dishes */
+    @Query("SELECT AVG(dr.rating) FROM DishRating dr")
+    Double getGlobalAverageDishRating();
+
+    /** Last served date for a dish */
+    @Query("SELECT MAX(dmd.dailyMenu.menuDate) FROM DailyMenuDish dmd WHERE dmd.dish.id = :dishId")
+    LocalDate findLastServedDate(@Param("dishId") Long dishId);
+
+    /** Rating history for a resident grouped by menu date with filters */
+    @Query("SELECT dr FROM DishRating dr " +
+            "WHERE dr.resident.id = :residentId " +
+            "AND (:dishName IS NULL OR LOWER(dr.dish.name) LIKE LOWER(CONCAT('%', :dishName, '%')) " +
+            "     OR LOWER(dr.dish.displayName) LIKE LOWER(CONCAT('%', :dishName, '%'))) " +
+            "AND (:minRating IS NULL OR dr.rating >= :minRating) " +
+            "AND (:category IS NULL OR dr.dish.category = :category) " +
+            "AND (:startDate IS NULL OR dr.dailyMenu.menuDate >= :startDate) " +
+            "AND (:endDate IS NULL OR dr.dailyMenu.menuDate <= :endDate) " +
+            "ORDER BY dr.dailyMenu.menuDate DESC, dr.dish.name ASC")
+    List<DishRating> findHistoryByFilters(
+            @Param("residentId") Long residentId,
+            @Param("dishName") String dishName,
+            @Param("minRating") Integer minRating,
+            @Param("category") String category,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    /** Dish ratings submitted for a menu by all residents (for admin feedback status) */
+    @Query("SELECT dr.resident.id, COUNT(dr) FROM DishRating dr " +
+            "WHERE dr.dailyMenu.id = :menuId GROUP BY dr.resident.id")
+    List<Object[]> countDishRatingsPerResidentForMenu(@Param("menuId") Long menuId);
+    /** Average dish rating for a specific menu date */
+    @Query("SELECT AVG(dr.rating) FROM DishRating dr WHERE dr.dailyMenu.menuDate = :date")
+    Double getAverageRatingByDate(@Param("date") LocalDate date);
 }
