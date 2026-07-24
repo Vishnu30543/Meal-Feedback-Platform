@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, History } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, History, Megaphone } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import DishDetailsModal from '../../components/DishDetailsModal';
@@ -29,6 +29,12 @@ export default function ResidentDashboard() {
   const { data: tips } = useQuery({
     queryKey: ['healthTips'],
     queryFn: () => api.get('/health-tips/today').then(res => res.data)
+  });
+
+  // Fetch Active Announcements
+  const { data: announcements } = useQuery({
+    queryKey: ['activeAnnouncements'],
+    queryFn: () => api.get('/announcements/active').then(res => res.data)
   });
 
   // Fetch Today's Menu
@@ -89,6 +95,29 @@ export default function ResidentDashboard() {
           </p>
         </div>
       </div>
+
+      {/* Announcements */}
+      {announcements && announcements.length > 0 && (
+        <div className="space-y-4">
+          {announcements.map((announcement: any) => (
+            <div key={announcement.id} className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 sm:p-5 flex gap-4 items-start shadow-sm relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                <Megaphone className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">{announcement.title}</h4>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">{announcement.description}</p>
+                {announcement.imageUrl && !announcement.imageUrl.startsWith('file:///') && (
+                  <div className="mt-4 rounded-xl overflow-hidden max-w-md border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <img src={announcement.imageUrl} alt={announcement.title} className="w-full h-auto object-cover max-h-48" />
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Action Card: Today's Rating */}
       <div className="card p-1">

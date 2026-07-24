@@ -521,8 +521,11 @@ public class AnalyticsService {
                     .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName());
             if ("avg".equals(valueType)) {
                 builder.averageRating(round(value.doubleValue()));
+                builder.ratingCount(dishRatingRepository.countByDishId(dishId));
             } else {
                 builder.ratingCount(value.longValue());
+                Double avg = dishRatingRepository.getAverageRatingByDishId(dishId);
+                if (avg != null) builder.averageRating(round(avg));
             }
             builder.servedCount(menuDishRepository.countMenusContainingDish(dishId));
             builder.savedCount(cookLaterRepository.countByDishId(dishId));

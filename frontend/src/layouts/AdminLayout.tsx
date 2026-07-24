@@ -21,6 +21,7 @@ export default function AdminLayout() {
     { name: 'Menus', path: '/admin/menus', icon: FileText },
     { name: 'Dishes', path: '/admin/dishes', icon: Utensils },
     { name: 'Sadhakas', path: '/admin/residents', icon: Users },
+    { name: 'Top Dishes', path: '/admin/top-dishes', icon: TrendingUp },
     { name: 'Content', path: '/admin/announcements', icon: Bell },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];

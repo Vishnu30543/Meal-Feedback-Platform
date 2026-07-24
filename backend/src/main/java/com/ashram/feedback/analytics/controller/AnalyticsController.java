@@ -97,7 +97,7 @@ public class AnalyticsController {
     }
 
     @GetMapping("/top-dishes")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('RESIDENT', 'ADMIN')")
     @Operation(summary = "Top dishes by metric",
             description = "metric: TOP_RATED | MOST_RATED | MOST_SAVED | MOST_FAVOURITED")
     public ResponseEntity<ApiResponse<List<TopDishDto>>> getTopDishes(
