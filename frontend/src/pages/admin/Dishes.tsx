@@ -23,6 +23,11 @@ export default function Dishes() {
     }
   };
 
+  const getValidImageUrl = (dish: any) => {
+    const url = dish.primaryImageUrl || dish.imageUrl;
+    return url && !url.startsWith('file:///') ? url : null;
+  };
+
   const { data, isLoading } = useQuery({
     queryKey: ['dishes', page, search, category],
     queryFn: () => {
@@ -105,8 +110,8 @@ export default function Dishes() {
                     <td className="px-6 py-4">
                       <div className="flex items-center">
                         <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden mr-3 shrink-0">
-                          {dish.primaryImageUrl || dish.imageUrl ? (
-                            <img src={dish.primaryImageUrl || dish.imageUrl} alt={dish.name} className="w-full h-full object-cover" />
+                          {getValidImageUrl(dish) ? (
+                            <img src={getValidImageUrl(dish)} alt={dish.name} className="w-full h-full object-cover" />
                           ) : (
                             <ImageIcon className="w-5 h-5 text-slate-400 dark:text-slate-500" />
                           )}
