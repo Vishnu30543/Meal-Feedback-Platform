@@ -24,6 +24,9 @@ public class DishAnalyticsDto {
     /** Monthly trend: month name -> average rating */
     private List<MonthlyTrendEntry> monthlyTrend;
 
+    /** Daily trend: date string -> average rating, for the last 30 days */
+    private List<DailyTrendEntry> dailyTrend;
+
     /** Rating distribution: star value -> count */
     private Map<Integer, Long> ratingDistribution;
 
@@ -40,6 +43,16 @@ public class DishAnalyticsDto {
     public static class MonthlyTrendEntry {
         private String month;
         private Double averageRating;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DailyTrendEntry {
+        private String date;
+        private Double averageRating;
+        private Long totalRatings;
     }
 
     @Data

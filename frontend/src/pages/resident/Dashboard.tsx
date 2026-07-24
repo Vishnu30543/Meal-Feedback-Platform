@@ -44,7 +44,7 @@ export default function ResidentDashboard() {
     queryFn: () => api.get('/cook-later').then(res => res.data)
   });
 
-  const savedDishIds = new Set(savedRecipes?.map((item: any) => item.dish.id) || []);
+  const savedDishIds = new Set<number>(savedRecipes?.map((item: any) => item.dish.id) || []);
 
   const toggleSaveMutation = useMutation({
     mutationFn: async (dishId: number) => {
@@ -90,27 +90,18 @@ export default function ResidentDashboard() {
         </div>
       </div>
 
-      {/* Feedback Reminder Banner — only when today's menu is published and feedback is pending before midnight */}
-      {progress?.totalDishes > 0 && progress?.editable && (
-        (progress.ratedDishes < progress.totalDishes || !progress.overallRated) && (
-          <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
-            <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
-              <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-            </div>
-            <div className="flex-1">
-              <p className="font-semibold text-amber-800 dark:text-amber-200 text-sm">Today's lunch feedback is pending.</p>
-              <p className="text-amber-600 dark:text-amber-400 text-xs mt-0.5">Please submit before 11:59 PM.</p>
-            </div>
-            <Link to="/resident/menu/today" className="shrink-0 text-xs font-bold text-amber-700 dark:text-amber-300 hover:underline">Rate Now →</Link>
-          </div>
-        )
-      )}
-
       {/* Action Card: Today's Rating */}
       <div className="card p-1">
         <div className="bg-white dark:bg-slate-800 rounded-[15px] p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex-1 w-full">
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1">Today's Lunch</h3>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Today's Lunch</h3>
+              {progress?.totalDishes > 0 && progress?.editable && (progress.ratedDishes < progress.totalDishes || !progress.overallRated) && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                  <Bell className="w-3 h-3" /> Pending
+                </span>
+              )}
+            </div>
             {progress?.totalDishes > 0 ? (
               <div>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">

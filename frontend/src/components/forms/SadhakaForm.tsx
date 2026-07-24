@@ -14,6 +14,9 @@ export default function SadhakaForm({ initialData, onSuccess, onCancel }: Sadhak
     residentCode: initialData?.residentCode || '',
     name: initialData?.name || '',
     phone: initialData?.phone || '',
+    doj: initialData?.doj ? initialData.doj.split('T')[0] : new Date().toISOString().split('T')[0],
+    duration: '',
+    customDays: 30,
   });
 
   const mutation = useMutation({
@@ -25,7 +28,10 @@ export default function SadhakaForm({ initialData, onSuccess, onCancel }: Sadhak
           phone: data.phone
         });
       }
-      return api.post('/residents', data);
+      return api.post('/residents', {
+        ...data,
+        customDays: data.duration === 'CUSTOM' ? data.customDays : undefined
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['residents'] });
@@ -74,6 +80,53 @@ export default function SadhakaForm({ initialData, onSuccess, onCancel }: Sadhak
           placeholder="Phone number"
         />
       </div>
+
+      <div>
+        <label className="label-text">Date of Joining</label>
+        <input
+          type="date"
+          className="input-field"
+          value={formData.doj}
+          onChange={(e) => setFormData({ ...formData, doj: e.target.value })}
+        />
+      </div>
+
+      {!initialData && (
+        <>
+          <div>
+            <label className="label-text">Initial Camp Duration (Optional)</label>
+            <select
+              className="input-field"
+              value={formData.duration}
+              onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+            >
+              <option value="">No Initial Camp</option>
+              <option value="FIFTEEN">15 Days</option>
+              <option value="THIRTY">30 Days</option>
+              <option value="SIXTY">60 Days</option>
+              <option value="NINETY">90 Days</option>
+              <option value="PERMANENT">Permanent</option>
+              <option value="CUSTOM">Custom Days...</option>
+            </select>
+          </div>
+
+          {formData.duration === 'CUSTOM' && (
+            <div>
+              <label className="label-text">Number of Days <span className="text-red-500">*</span></label>
+              <input
+                type="number"
+                min="1"
+                max="36500"
+                required
+                className="input-field"
+                value={formData.customDays}
+                onChange={(e) => setFormData({ ...formData, customDays: parseInt(e.target.value) || 30 })}
+                placeholder="e.g. 45"
+              />
+            </div>
+          )}
+        </>
+      )}
 
       {mutation.isError && (
         <div className="text-red-500 text-sm p-2 bg-red-50 dark:bg-red-900/20 rounded">

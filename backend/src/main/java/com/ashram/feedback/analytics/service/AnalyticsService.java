@@ -7,6 +7,7 @@ import com.ashram.feedback.dish.entity.DishStatus;
 import com.ashram.feedback.dish.repository.DishRepository;
 import com.ashram.feedback.favourite.repository.FavouriteDishRepository;
 import com.ashram.feedback.menu.entity.DailyMenu;
+import com.ashram.feedback.menu.entity.DailyMenuDish;
 import com.ashram.feedback.menu.repository.DailyMenuDishRepository;
 import com.ashram.feedback.menu.repository.DailyMenuRepository;
 import com.ashram.feedback.rating.entity.DishRating;
@@ -144,6 +145,91 @@ public class AnalyticsService {
                             .build();
                 })
                 .sorted(Comparator.comparing(AdminFeedbackStatusDto::getStatus))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Today's Dish Feedback — Per-dish average rating and comments for today's menu.
+     */
+    @Transactional(readOnly = true)
+    public List<TodayDishFeedbackDto> getTodayDishesFeedback() {
+        LocalDate today = LocalDate.now();
+        Optional<DailyMenu> todayMenuOpt = menuRepository.findPublishedByDate(today);
+        if (todayMenuOpt.isEmpty()) return Collections.emptyList();
+
+        Long menuId = todayMenuOpt.get().getId();
+        List<DishRating> todayRatings = dishRatingRepository.findByDailyMenuId(menuId);
+
+        // Group ratings by dish
+        Map<Long, List<DishRating>> ratingsByDish = todayRatings.stream()
+                .collect(Collectors.groupingBy(dr -> dr.getDish().getId()));
+
+        List<TodayDishFeedbackDto> result = new ArrayList<>();
+
+        for (DailyMenuDish menuDish : todayMenuOpt.get().getMenuDishes()) {
+            Dish dish = menuDish.getDish();
+            List<DishRating> drList = ratingsByDish.getOrDefault(dish.getId(), Collections.emptyList());
+
+            double avgRating = 0;
+            long count = drList.size();
+            List<TodayDishFeedbackDto.CommentEntry> comments = new ArrayList<>();
+
+            if (count > 0) {
+                avgRating = drList.stream().mapToInt(DishRating::getRating).average().orElse(0.0);
+                comments = drList.stream()
+                        .filter(dr -> dr.getComment() != null 
+                                && !dr.getComment().trim().isEmpty() 
+                                && !dr.getComment().equals("No comment provided"))
+                        .map(dr -> TodayDishFeedbackDto.CommentEntry.builder()
+                                .rating(dr.getRating())
+                                .comment(dr.getComment())
+                                .residentId(dr.getResident().getId())
+                                .residentName(dr.getResident().getName())
+                                .residentCode(dr.getResident().getResidentCode())
+                                .build())
+                        .collect(Collectors.toList());
+            }
+
+            // Fetch historical trend (max 10 recent dates)
+            List<Object[]> rawTrend = dishRatingRepository.getHistoricalAverageRatingByDishIdGroupedByDate(dish.getId());
+            List<TodayDishFeedbackDto.TrendPoint> trend = rawTrend.stream()
+                    .skip(Math.max(0, rawTrend.size() - 10)) // Get last 10 points
+                    .map(row -> TodayDishFeedbackDto.TrendPoint.builder()
+                            .date(((LocalDate) row[0]).toString())
+                            .averageRating(round(((Number) row[1]).doubleValue()))
+                            .build())
+                    .collect(Collectors.toList());
+
+            result.add(TodayDishFeedbackDto.builder()
+                    .dishId(dish.getId())
+                    .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName())
+                    .averageRating(count > 0 ? round(avgRating) : 0.0)
+                    .ratingCount(count)
+                    .trend(trend)
+                    .comments(comments)
+                    .build());
+        }
+
+        return result;
+    }
+
+    /**
+     * Get historical comments for a specific dish on a specific date.
+     */
+    @Transactional(readOnly = true)
+    public List<TodayDishFeedbackDto.CommentEntry> getHistoricalComments(Long dishId, LocalDate date) {
+        List<DishRating> drList = dishRatingRepository.findByDishIdAndDailyMenuMenuDate(dishId, date);
+        return drList.stream()
+                .filter(dr -> dr.getComment() != null 
+                        && !dr.getComment().trim().isEmpty() 
+                        && !dr.getComment().equals("No comment provided"))
+                .map(dr -> TodayDishFeedbackDto.CommentEntry.builder()
+                        .rating(dr.getRating())
+                        .comment(dr.getComment())
+                        .residentId(dr.getResident().getId())
+                        .residentName(dr.getResident().getName())
+                        .residentCode(dr.getResident().getResidentCode())
+                        .build())
                 .collect(Collectors.toList());
     }
 
@@ -312,6 +398,20 @@ public class AnalyticsService {
                     .build());
         }
 
+        // Daily trend
+        List<DishAnalyticsDto.DailyTrendEntry> dailyTrend = new ArrayList<>();
+        List<Object[]> dailyData = dishRatingRepository.getHistoricalAverageRatingByDishIdGroupedByDate(dishId);
+        for (Object[] row : dailyData) {
+            LocalDate date = (LocalDate) row[0];
+            Double avg = (Double) row[1];
+            Long count = (Long) row[2];
+            dailyTrend.add(DishAnalyticsDto.DailyTrendEntry.builder()
+                    .date(date.toString())
+                    .averageRating(avg != null ? round(avg) : null)
+                    .totalRatings(count)
+                    .build());
+        }
+
         // Latest 20 comments
         Page<DishRating> latestPage = dishRatingRepository.findLatestCommentsByDish(dishId, PageRequest.of(0, 20));
         List<DishAnalyticsDto.CommentEntry> latestComments = latestPage.getContent().stream()
@@ -337,6 +437,7 @@ public class AnalyticsService {
                 .highestRating(highest > 0 ? highest : null)
                 .lowestRating(lowest > 0 ? lowest : null)
                 .monthlyTrend(monthlyTrend)
+                .dailyTrend(dailyTrend)
                 .ratingDistribution(distribution)
                 .latestComments(latestComments)
                 .mostUsedComments(topPhrases)

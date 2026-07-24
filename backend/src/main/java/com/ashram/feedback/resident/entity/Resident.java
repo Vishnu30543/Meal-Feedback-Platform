@@ -6,6 +6,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,9 @@ public class Resident {
     @Builder.Default
     private List<Camp> camps = new ArrayList<>();
 
+    @Column(name = "doj")
+    private LocalDate doj;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -53,8 +57,10 @@ public class Resident {
      * Get the currently active camp, if any.
      */
     public Camp getActiveCamp() {
+        LocalDate today = LocalDate.now();
         return camps.stream()
                 .filter(Camp::isActive)
+                .filter(c -> !c.getStartDate().isAfter(today) && !c.getEndDate().isBefore(today))
                 .findFirst()
                 .orElse(null);
     }

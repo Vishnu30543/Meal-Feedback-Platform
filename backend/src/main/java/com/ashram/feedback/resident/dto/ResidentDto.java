@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class ResidentDto {
     private String residentCode;
     private String name;
     private String phone;
+    private LocalDate doj;
     private List<CampDto> camps;
     private CampDto activeCamp;
     private LocalDateTime createdAt;

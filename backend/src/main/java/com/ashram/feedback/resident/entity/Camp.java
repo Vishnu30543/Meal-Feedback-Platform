@@ -50,13 +50,21 @@ public class Camp {
     private LocalDateTime updatedAt;
 
     /**
+     * Optional custom duration in days. Used only when duration = CUSTOM.
+     */
+    @Column(name = "custom_days")
+    private Integer customDays;
+
+    /**
      * Camp duration options at the ashram.
      */
     public enum CampDuration {
         FIFTEEN(15),
         THIRTY(30),
         SIXTY(60),
-        NINETY(90);
+        NINETY(90),
+        CUSTOM(0),
+        PERMANENT(36500); // 100 years
 
         private final int days;
 

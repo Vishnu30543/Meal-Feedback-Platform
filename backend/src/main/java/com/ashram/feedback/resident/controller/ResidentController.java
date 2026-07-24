@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -50,6 +51,23 @@ public class ResidentController {
         ResidentDto resident = residentService.createResident(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Resident created successfully", resident));
+    }
+
+    @PostMapping("/bulk-upload")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Bulk upload residents from Excel", description = "Requires an .xlsx file with columns: Resident ID, Name, Phone, Duration")
+    public ResponseEntity<ApiResponse<Integer>> bulkUploadResidents(@RequestParam("file") MultipartFile file) {
+        int count = residentService.bulkUploadResidents(file);
+        return ResponseEntity.ok(ApiResponse.success("Bulk upload completed. " + count + " residents added.", count));
+    }
+
+    @PatchMapping("/bulk-archive")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Bulk archive residents")
+    public ResponseEntity<ApiResponse<Integer>> bulkArchiveResidents(
+            @Valid @RequestBody BulkArchiveRequest request) {
+        int count = residentService.bulkArchiveResidents(request.getIds());
+        return ResponseEntity.ok(ApiResponse.success("Successfully archived " + count + " residents", count));
     }
 
     @PutMapping("/{id}")

@@ -42,6 +42,23 @@ public class AnalyticsController {
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getTodayFeedbackStatus()));
     }
 
+    @GetMapping("/feedback-status/today-dishes")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Today's Dish Feedback",
+            description = "Per-dish average rating and comments for today's menu")
+    public ResponseEntity<ApiResponse<List<TodayDishFeedbackDto>>> getTodayDishesFeedback() {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getTodayDishesFeedback()));
+    }
+
+    @GetMapping("/dish/{dishId}/comments")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Historical comments for a dish on a specific date")
+    public ResponseEntity<ApiResponse<List<TodayDishFeedbackDto.CommentEntry>>> getHistoricalComments(
+            @PathVariable Long dishId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getHistoricalComments(dishId, date)));
+    }
+
     @GetMapping("/daily-trends")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Daily trends for dashboard metrics",

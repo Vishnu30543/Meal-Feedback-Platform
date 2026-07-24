@@ -17,6 +17,8 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
 
     List<DishRating> findByResidentIdAndDailyMenuId(Long residentId, Long menuId);
 
+    List<DishRating> findByDailyMenuId(Long menuId);
+
     Optional<DishRating> findByResidentIdAndDailyMenuIdAndDishId(
             Long residentId, Long menuId, Long dishId);
 
@@ -103,4 +105,12 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
     /** Average dish rating for a specific menu date */
     @Query("SELECT AVG(dr.rating) FROM DishRating dr WHERE dr.dailyMenu.menuDate = :date")
     Double getAverageRatingByDate(@Param("date") LocalDate date);
+
+    /** Historical trend grouped by date for a specific dish */
+    @Query("SELECT dr.dailyMenu.menuDate, AVG(dr.rating), COUNT(dr) FROM DishRating dr WHERE dr.dish.id = :dishId GROUP BY dr.dailyMenu.menuDate ORDER BY dr.dailyMenu.menuDate ASC")
+    List<Object[]> getHistoricalAverageRatingByDishIdGroupedByDate(@Param("dishId") Long dishId);
+
+    /** Historical comments for a specific dish on a specific date */
+    @Query("SELECT dr FROM DishRating dr WHERE dr.dish.id = :dishId AND dr.dailyMenu.menuDate = :date ORDER BY dr.createdAt DESC")
+    List<DishRating> findByDishIdAndDailyMenuMenuDate(@Param("dishId") Long dishId, @Param("date") LocalDate date);
 }

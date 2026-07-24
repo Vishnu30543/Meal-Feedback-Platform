@@ -25,7 +25,7 @@ export default function TodayMenu() {
     queryFn: () => api.get('/cook-later').then(res => res.data)
   });
 
-  const savedDishIds = new Set(savedRecipes?.map((item: any) => item.dish.id) || []);
+  const savedDishIds = new Set<number>(savedRecipes?.map((item: any) => item.dish.id) || []);
 
   const toggleSaveMutation = useMutation({
     mutationFn: async (dishId: number) => {
