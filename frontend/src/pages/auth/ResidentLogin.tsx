@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
-import { Loader2 } from 'lucide-react';
+import { Loader2, UserCircle, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const loginSchema = z.object({
@@ -53,36 +53,46 @@ export default function ResidentLogin() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div>
           <label className="label-text">Sadhaka ID</label>
-          <input
-            type="text"
-            {...register('residentCode')}
-            className={`input-field ${errors.residentCode ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
-            placeholder="e.g. 1001"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <UserCircle className="h-5 w-5" />
+            </div>
+            <input
+              type="text"
+              {...register('residentCode')}
+              className={`input-field pl-10 ${errors.residentCode ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+              placeholder="e.g. 1001"
+            />
+          </div>
           {errors.residentCode && <p className="mt-1.5 text-sm text-red-600">{errors.residentCode.message}</p>}
         </div>
 
         <div>
           <label className="label-text">Camp Start Date</label>
-          <input
-            type="date"
-            {...register('campStartDate')}
-            className={`input-field ${errors.campStartDate ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <Calendar className="h-5 w-5" />
+            </div>
+            <input
+              type="date"
+              {...register('campStartDate')}
+              className={`input-field pl-10 ${errors.campStartDate ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20' : ''}`}
+            />
+          </div>
           {errors.campStartDate && <p className="mt-1.5 text-sm text-red-600">{errors.campStartDate.message}</p>}
         </div>
 
         <button
           type="submit"
           disabled={isSubmitting}
-          className="btn-primary w-full flex justify-center py-3 text-base"
+          className="btn-primary w-full flex justify-center py-3 text-base shadow-primary-500/25 mt-2"
         >
           {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Enter App'}
         </button>
       </form>
 
       <div className="text-center mt-6">
-        <Link to="/login/admin" className="text-sm font-medium text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:text-slate-200 transition-colors">
+        <Link to="/login/admin" className="text-sm font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 transition-colors">
           Admin Login
         </Link>
       </div>

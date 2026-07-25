@@ -129,7 +129,11 @@ export default function ResidentDashboard() {
         <div className="bg-white dark:bg-slate-800 rounded-[15px] p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex-1 w-full">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Today's Lunch</h3>
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                {progress?.totalDishes > 0 && !progress?.editable 
+                  ? 'Camp Session Completed' 
+                  : 'Daily Meal Feedback'}
+              </h3>
               {progress?.totalDishes > 0 && progress?.editable && (progress.ratedDishes < progress.totalDishes || !progress.overallRated) && (
                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
                   <Bell className="w-3 h-3" /> Pending
@@ -138,15 +142,23 @@ export default function ResidentDashboard() {
             </div>
             {progress?.totalDishes > 0 ? (
               <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
-                  Rated <span className="font-semibold text-slate-800 dark:text-slate-100">{progress?.ratedDishes} / {progress?.totalDishes}</span> items
-                </p>
-                <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
-                  <div
-                    className="bg-primary-500 h-2 rounded-full transition-all duration-1000 ease-out"
-                    style={{ width: `${(progress.ratedDishes / progress.totalDishes) * 100}%` }}
-                  />
-                </div>
+                {!progress?.editable ? (
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                    Thank you for sharing your feedback during your stay.
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                      Reviewed <span className="font-semibold text-slate-800 dark:text-slate-100">{progress?.ratedDishes} of {progress?.totalDishes}</span> dishes
+                    </p>
+                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
+                      <div
+                        className="bg-primary-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                        style={{ width: `${(progress.ratedDishes / progress.totalDishes) * 100}%` }}
+                      />
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <p className="text-slate-500 dark:text-slate-400 text-sm">Menu not available yet</p>
@@ -155,18 +167,23 @@ export default function ResidentDashboard() {
 
           <Link
             to="/resident/menu/today"
-            className={`w-full sm:w-auto shrink-0 flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all ${progress?.totalDishes > 0
-                ? progress?.ratedDishes === progress?.totalDishes
-                  ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
-                  : 'bg-primary-600 text-white shadow-md hover:bg-primary-700 hover:shadow-lg'
+            className={`w-full sm:w-auto shrink-0 flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all ${
+              progress?.totalDishes > 0
+                ? !progress?.editable
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                  : progress?.ratedDishes === progress?.totalDishes
+                    ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
+                    : 'bg-primary-600 text-white shadow-md hover:bg-primary-700 hover:shadow-lg'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
-              }`}
+            }`}
             onClick={(e) => {
-              if (!progress?.totalDishes) e.preventDefault();
+              if (!progress?.totalDishes || !progress?.editable) e.preventDefault();
             }}
           >
             {progress?.totalDishes > 0
-              ? progress?.ratedDishes === progress?.totalDishes ? 'Review Ratings' : 'Rate Now'
+              ? !progress?.editable
+                ? 'Camp Ended'
+                : progress?.ratedDishes === progress?.totalDishes ? 'Review Ratings' : 'Rate Now'
               : 'Waiting...'
             }
             <ChevronRight className="w-5 h-5 ml-1" />
@@ -196,7 +213,7 @@ export default function ResidentDashboard() {
         <div className="card p-6">
           <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Utensils className="w-5 h-5 text-primary-500" />
-            Today's Menu Directory
+            Explore Today's Menu
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {menu.dishes.map((md: any, idx: number) => (

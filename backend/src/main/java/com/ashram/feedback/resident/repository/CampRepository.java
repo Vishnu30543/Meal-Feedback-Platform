@@ -24,4 +24,7 @@ public interface CampRepository extends JpaRepository<Camp, Long> {
 
     @Query("SELECT COUNT(c) FROM Camp c WHERE c.active = true")
     long countActiveCamps();
+
+    @Query("SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END FROM Camp c WHERE c.resident.id = :residentId AND c.active = true AND c.startDate <= :today AND c.endDate >= :today")
+    boolean hasActiveCamp(@Param("residentId") Long residentId, @Param("today") LocalDate today);
 }

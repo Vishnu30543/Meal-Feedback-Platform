@@ -12,6 +12,7 @@ import com.ashram.feedback.rating.entity.OverallLunchRating;
 import com.ashram.feedback.rating.repository.DishRatingRepository;
 import com.ashram.feedback.rating.repository.OverallLunchRatingRepository;
 import com.ashram.feedback.resident.entity.Resident;
+import com.ashram.feedback.resident.repository.CampRepository;
 import com.ashram.feedback.resident.repository.ResidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ public class RatingService {
     private final DailyMenuRepository menuRepository;
     private final DishRepository dishRepository;
     private final ResidentRepository residentRepository;
+    private final CampRepository campRepository;
 
     /**
      * Submit or update ratings for a menu.
@@ -46,6 +48,10 @@ public class RatingService {
         // Check editability
         if (!isEditable(menu.getMenuDate())) {
             throw new BusinessException("Ratings can only be submitted or edited on the same day.");
+        }
+
+        if (!campRepository.hasActiveCamp(residentId, LocalDate.now())) {
+            throw new BusinessException("You cannot submit ratings because you do not have an active camp session today.");
         }
 
         Resident resident = residentRepository.findById(residentId)
@@ -151,12 +157,14 @@ public class RatingService {
         boolean overallRated = overallRatingRepository
                 .findByResidentIdAndDailyMenuId(residentId, todayMenu.getId()).isPresent();
 
+        boolean isEditable = isEditable(todayMenu.getMenuDate()) && campRepository.hasActiveCamp(residentId, LocalDate.now());
+
         return RatingProgressDto.builder()
                 .menuId(todayMenu.getId())
                 .totalDishes(totalDishes)
                 .ratedDishes((int) ratedDishes)
                 .overallRated(overallRated)
-                .editable(isEditable(todayMenu.getMenuDate()))
+                .editable(isEditable)
                 .build();
     }
 
