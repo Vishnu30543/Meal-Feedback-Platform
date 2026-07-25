@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Trophy, Star, Utensils, Heart, Activity, Medal } from 'lucide-react';
+import { Trophy, Star, Utensils, Heart, Activity } from 'lucide-react';
 
 export default function AdminTopDishes() {
   const { data: topDishes, isLoading } = useQuery({

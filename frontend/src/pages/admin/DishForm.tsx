@@ -134,7 +134,7 @@ export default function DishForm() {
     mutation.mutate(formData);
   };
 
-  const formVariants = {
+  const formVariants: any = {
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeOut' } },
     exit: { opacity: 0, x: -20, transition: { duration: 0.2, ease: 'easeIn' } }

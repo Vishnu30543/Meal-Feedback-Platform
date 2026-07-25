@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
-import { Trophy, Star, Utensils, Bookmark, Medal } from 'lucide-react';
+import { Trophy, Star, Utensils, Bookmark } from 'lucide-react';
 
 export default function ResidentTopDishes() {
   const queryClient = useQueryClient();
