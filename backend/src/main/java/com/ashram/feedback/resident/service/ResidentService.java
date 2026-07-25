@@ -102,7 +102,7 @@ public class ResidentService {
             Camp camp = Camp.builder()
                     .resident(resident)
                     .startDate(startDate)
-                    .endDate(startDate.plusDays(days))
+                    .endDate(calculateCampEndDate(startDate, days))
                     .duration(durationEnum)
                     .customDays(durationEnum == Camp.CampDuration.CUSTOM ? request.getCustomDays() : null)
                     .active(true)
@@ -233,14 +233,14 @@ public class ResidentService {
                         Camp existingCamp = existingCampOpt.get();
                         existingCamp.setDuration(durationEnum);
                         existingCamp.setCustomDays(customDays);
-                        existingCamp.setEndDate(startDate.plusDays(days));
+                        existingCamp.setEndDate(calculateCampEndDate(startDate, days));
                         existingCamp.setActive(true);
                         campRepository.save(existingCamp);
                     } else {
                         Camp camp = Camp.builder()
                                 .resident(resident)
                                 .startDate(startDate)
-                                .endDate(startDate.plusDays(days))
+                                .endDate(calculateCampEndDate(startDate, days))
                                 .duration(durationEnum)
                                 .customDays(customDays)
                                 .active(true)
@@ -307,7 +307,7 @@ public class ResidentService {
                         camp.setCustomDays(null);
                     }
                     int days = durationEnum == Camp.CampDuration.CUSTOM ? camp.getCustomDays() : durationEnum.getDays();
-                    camp.setEndDate(camp.getStartDate().plusDays(days));
+                    camp.setEndDate(calculateCampEndDate(camp.getStartDate(), days));
                     campRepository.save(camp);
                 }
             } catch (Exception e) {
@@ -336,7 +336,7 @@ public class ResidentService {
         Camp camp = Camp.builder()
                 .resident(resident)
                 .startDate(request.getStartDate())
-                .endDate(request.getStartDate().plusDays(request.getDuration().getDays()))
+                .endDate(calculateCampEndDate(request.getStartDate(), request.getDuration().getDays()))
                 .duration(request.getDuration())
                 .active(true)
                 .build();
@@ -449,5 +449,32 @@ public class ResidentService {
             } catch (DateTimeParseException ignored) {}
         }
         return null;
+    }
+
+    private LocalDate calculateCampEndDate(LocalDate startDate, int durationDays) {
+        // If it's a completely custom duration not a multiple of 15, fallback to strict plusDays
+        if (durationDays < 15 || durationDays % 15 != 0) {
+            return startDate.plusDays(durationDays);
+        }
+        
+        int blocks = durationDays / 15;
+        LocalDate current = startDate;
+        
+        for (int i = 0; i < blocks; i++) {
+            if (current.getDayOfMonth() <= 15) {
+                // If it starts in the first half, it ends on the 15th of the same month
+                current = current.withDayOfMonth(15);
+            } else {
+                // If it starts in the second half, it ends on the last day of the same month
+                current = current.withDayOfMonth(current.lengthOfMonth());
+            }
+            
+            // If there are more blocks left, advance to the next day to start the next block
+            if (i < blocks - 1) {
+                current = current.plusDays(1);
+            }
+        }
+        
+        return current;
     }
 }
