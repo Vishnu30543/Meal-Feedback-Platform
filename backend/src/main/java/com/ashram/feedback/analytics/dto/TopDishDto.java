@@ -6,6 +6,7 @@ import lombok.*;
 public class TopDishDto {
     private Long dishId;
     private String dishName;
+    private String imageUrl;
     private Double averageRating;
     private long ratingCount;
     private long savedCount;

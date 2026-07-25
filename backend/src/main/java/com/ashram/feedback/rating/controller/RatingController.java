@@ -2,7 +2,6 @@ package com.ashram.feedback.rating.controller;
 
 import com.ashram.feedback.auth.security.JwtUserPrincipal;
 import com.ashram.feedback.common.dto.ApiResponse;
-import com.ashram.feedback.rating.dto.RatingHistoryDto;
 import com.ashram.feedback.rating.dto.RatingProgressDto;
 import com.ashram.feedback.rating.dto.SubmitRatingsRequest;
 import com.ashram.feedback.rating.service.RatingService;
@@ -58,27 +57,4 @@ public class RatingController {
                 ratingService.getRatingProgress(principal.getUserId())));
     }
 
-    /**
-     * Resident rating history with advanced filters.
-     * - dishName: partial match on dish name/display name
-     * - minRating: minimum star rating (1–5)
-     * - category: dish category (e.g. CURRY, SOUP)
-     * - startDate / endDate: date range filter
-     * - sortBy: NEWEST (default), OLDEST, HIGHEST, LOWEST
-     */
-    @GetMapping("/history")
-    @PreAuthorize("hasRole('RESIDENT')")
-    @Operation(summary = "Get my rating history",
-            description = "Full day-by-day history grouped by menu date with optional advanced filters")
-    public ResponseEntity<ApiResponse<List<RatingHistoryDto>>> getRatingHistory(
-            @AuthenticationPrincipal JwtUserPrincipal principal,
-            @RequestParam(required = false) String dishName,
-            @RequestParam(required = false) Integer minRating,
-            @RequestParam(required = false) String category,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return ResponseEntity.ok(ApiResponse.success(
-                ratingService.getRatingHistory(
-                        principal.getUserId(), dishName, minRating, category, startDate, endDate)));
-    }
 }

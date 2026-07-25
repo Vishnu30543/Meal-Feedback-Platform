@@ -500,6 +500,7 @@ public class AnalyticsService {
                 .map(dish -> TopDishDto.builder()
                         .dishId(dish.getId())
                         .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName())
+                        .imageUrl(dish.getPrimaryImageUrl())
                         .averageRating(round(value))
                         .build())
                 .orElse(null);
@@ -518,7 +519,8 @@ public class AnalyticsService {
 
             TopDishDto.TopDishDtoBuilder builder = TopDishDto.builder()
                     .dishId(dish.getId())
-                    .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName());
+                    .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName())
+                    .imageUrl(dish.getPrimaryImageUrl());
             if ("avg".equals(valueType)) {
                 builder.averageRating(round(value.doubleValue()));
                 builder.ratingCount(dishRatingRepository.countByDishId(dishId));

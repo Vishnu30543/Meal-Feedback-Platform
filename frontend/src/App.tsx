@@ -31,7 +31,6 @@ const ResidentDashboard = lazy(() => import('./pages/resident/Dashboard'));
 const ResidentTodayMenu = lazy(() => import('./pages/resident/TodayMenu'));
 const ResidentFavourites = lazy(() => import('./pages/resident/Favourites'));
 const ResidentSavedRecipes = lazy(() => import('./pages/resident/SavedRecipes'));
-const ResidentHistory = lazy(() => import('./pages/resident/History'));
 const ResidentTopDishes = lazy(() => import('./pages/resident/TopDishes'));
 
 // Loading fallback
@@ -91,7 +90,6 @@ function App() {
           <Route path="menu/today" element={<ResidentTodayMenu />} />
           <Route path="favourites" element={<ResidentFavourites />} />
           <Route path="saved" element={<ResidentSavedRecipes />} />
-          <Route path="history" element={<ResidentHistory />} />
           <Route path="top-dishes" element={<ResidentTopDishes />} />
         </Route>
 

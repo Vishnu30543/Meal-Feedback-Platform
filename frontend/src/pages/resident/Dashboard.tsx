@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, History, Megaphone } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, Megaphone } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import DishDetailsModal from '../../components/DishDetailsModal';
@@ -83,16 +83,21 @@ export default function ResidentDashboard() {
     <div className="space-y-6 animate-in fade-in duration-500">
 
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 rounded-3xl p-6 sm:p-8 text-white shadow-float relative overflow-hidden">
-        {/* Subtle texture/pattern overlay instead of glaring blob */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-        <div className="absolute -right-20 -top-20 w-72 h-72 bg-white/5 rounded-full blur-3xl pointer-events-none"></div>
-        
-        <div className="relative z-10 flex flex-col gap-2">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Namaskaram, {user?.name?.split(' ')[0] || 'Sadhaka'}!</h2>
-          <p className="text-primary-50 text-sm sm:text-base opacity-90 max-w-md leading-relaxed">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden shadow-sm">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+        <div className="relative z-10 flex-1">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-semibold mb-3 border border-primary-100 dark:border-primary-500/20">
+            <span>Welcome Back</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            Namaskaram, {user?.name?.split(' ')[0] || 'Sadhaka'}!
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base max-w-xl leading-relaxed">
             Your feedback helps us provide the most healthy and satvik food for everyone in the ashram.
           </p>
+        </div>
+        <div className="hidden sm:flex relative z-10 w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary-50 to-primary-100 dark:from-slate-800 dark:to-slate-700 items-center justify-center border border-primary-200 dark:border-slate-700 shadow-sm rotate-3 hover:rotate-6 transition-transform">
+            <span className="text-2xl">🙏</span>
         </div>
       </div>
 
@@ -169,20 +174,7 @@ export default function ResidentDashboard() {
         </div>
       </div>
 
-      {/* View History Quick Action */}
-      <Link
-        to="/resident/history"
-        className="flex items-center gap-3 card p-4 hover:shadow-md transition-shadow group cursor-pointer"
-      >
-        <div className="w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center shrink-0 group-hover:bg-primary-100 transition-colors">
-          <History className="w-5 h-5 text-primary-600 dark:text-primary-400" />
-        </div>
-        <div className="flex-1">
-          <p className="font-semibold text-slate-800 dark:text-slate-100 text-sm">View Rating History</p>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Browse all your previous ratings & comments</p>
-        </div>
-        <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-primary-500 transition-colors" />
-      </Link>
+
 
       {/* Today's Menu Display */}
       {loadingMenu ? (

@@ -80,23 +80,7 @@ public interface DishRatingRepository extends JpaRepository<DishRating, Long> {
     @Query("SELECT MAX(dmd.dailyMenu.menuDate) FROM DailyMenuDish dmd WHERE dmd.dish.id = :dishId")
     LocalDate findLastServedDate(@Param("dishId") Long dishId);
 
-    /** Rating history for a resident grouped by menu date with filters */
-    @Query("SELECT dr FROM DishRating dr " +
-            "WHERE dr.resident.id = :residentId " +
-            "AND (:dishName IS NULL OR LOWER(dr.dish.name) LIKE LOWER(CONCAT('%', :dishName, '%')) " +
-            "     OR LOWER(dr.dish.displayName) LIKE LOWER(CONCAT('%', :dishName, '%'))) " +
-            "AND (:minRating IS NULL OR dr.rating >= :minRating) " +
-            "AND (:category IS NULL OR dr.dish.category = :category) " +
-            "AND (:startDate IS NULL OR dr.dailyMenu.menuDate >= :startDate) " +
-            "AND (:endDate IS NULL OR dr.dailyMenu.menuDate <= :endDate) " +
-            "ORDER BY dr.dailyMenu.menuDate DESC, dr.dish.name ASC")
-    List<DishRating> findHistoryByFilters(
-            @Param("residentId") Long residentId,
-            @Param("dishName") String dishName,
-            @Param("minRating") Integer minRating,
-            @Param("category") String category,
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
+
 
     /** Dish ratings submitted for a menu by all residents (for admin feedback status) */
     @Query("SELECT dr.resident.id, COUNT(dr) FROM DishRating dr " +
