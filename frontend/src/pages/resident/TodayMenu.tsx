@@ -147,34 +147,37 @@ export default function TodayMenu() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center">
-        <button onClick={() => navigate('/resident')} className="p-2 mr-2 text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:bg-slate-800 rounded-full">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100">Rate Today's Lunch</h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500">{format(new Date(), 'EEEE, MMMM do')}</p>
+    <div className="space-y-4">
+      {/* Header and Progress Bar Combined */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
+        <div className="flex items-center">
+          <button onClick={() => navigate('/resident')} className="p-2 mr-1 -ml-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-tight">Rate Today's Lunch</h1>
+            <p className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">{format(new Date(), 'EEEE, MMMM do')}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+            {isOverallStep ? 'Final Step' : `Item ${activeDishIndex + 1} of ${dishes.length}`}
+          </span>
+          <div className="flex gap-1">
+            {Array.from({ length: dishes.length + 1 }).map((_, idx) => (
+              <div
+                key={idx}
+                className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeDishIndex ? 'w-5 bg-primary-600' :
+                    idx < activeDishIndex ? 'w-2 bg-primary-300' : 'w-2 bg-slate-200 dark:bg-slate-700'
+                  }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-between items-center px-2">
-        <div className="flex gap-1">
-          {Array.from({ length: dishes.length + 1 }).map((_, idx) => (
-            <div
-              key={idx}
-              className={`h-1.5 rounded-full transition-all duration-300 ${idx === activeDishIndex ? 'w-6 bg-primary-600' :
-                  idx < activeDishIndex ? 'w-3 bg-primary-300' : 'w-3 bg-slate-200'
-                }`}
-            />
-          ))}
-        </div>
-        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 dark:text-slate-500 uppercase">
-          {isOverallStep ? 'Final Step' : `Item ${activeDishIndex + 1} of ${dishes.length}`}
-        </span>
-      </div>
-
-      <div className="relative overflow-hidden min-h-[400px]">
+      <div className="relative overflow-hidden min-h-[250px]">
         <AnimatePresence mode="wait">
           {!isOverallStep ? (
             <motion.div
@@ -185,67 +188,89 @@ export default function TodayMenu() {
               transition={{ duration: 0.2 }}
               className="card overflow-hidden"
             >
-              {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) && (
-                <div className="h-48 w-full bg-slate-100 dark:bg-slate-800 relative">
-                  <img
-                    src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl}
-                    alt={dishes[activeDishIndex].name}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute top-3 left-3 bg-white dark:bg-slate-800/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-primary-700 shadow-sm">
-                    {dishes[activeDishIndex].category}
-                  </div>
-                  <button
-                    onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
-                    className="absolute top-3 right-3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-2 rounded-full shadow-sm hover:scale-110 transition-transform"
-                    title={savedDishIds.has(dishes[activeDishIndex].id) ? "Remove from saved" : "Save for later"}
-                  >
-                    <Bookmark
-                      className={`w-5 h-5 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`}
+              <div className="flex flex-col md:flex-row p-4 sm:p-6 gap-6 md:gap-8 items-start">
+                {/* Left: Image */}
+                {(dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl) ? (
+                  <div className="w-full md:w-2/5 lg:w-1/3 shrink-0 relative aspect-[16/9] md:aspect-square rounded-2xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                    <img
+                      src={dishes[activeDishIndex].primaryImageUrl || dishes[activeDishIndex].imageUrl}
+                      alt={dishes[activeDishIndex].name}
+                      className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
                     />
-                  </button>
-                </div>
-              )}
-
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-1">
-                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}</h2>
-                  <button
-                    onClick={() => setIsDetailsModalOpen(true)}
-                    className="p-1.5 text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 rounded-lg transition-colors"
-                    title="View Details"
-                  >
-                    <Info className="w-5 h-5" />
-                  </button>
-                </div>
-                <p className="text-slate-500 dark:text-slate-400 dark:text-slate-500 text-sm mb-6 line-clamp-2">{dishes[activeDishIndex].description}</p>
-
-                <div className="flex flex-col items-center justify-center py-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl mb-6">
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">How did you like this dish?</p>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map(star => (
-                      <button
-                        key={star}
-                        onClick={() => handleRatingChange(dishes[activeDishIndex].id, star)}
-                        className={`p-2 transition-transform hover:scale-110 ${(ratings[dishes[activeDishIndex].id]?.rating || 0) >= star
-                            ? 'text-amber-400'
-                            : 'text-slate-200'
-                          }`}
-                      >
-                        <Star className="w-10 h-10 fill-current" />
-                      </button>
-                    ))}
+                    <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase text-primary-600 shadow-sm border border-slate-100 dark:border-slate-700">
+                      {dishes[activeDishIndex].category}
+                    </div>
+                    <button
+                      onClick={(e) => handleToggleSave(e, dishes[activeDishIndex].id)}
+                      className="absolute top-3 right-3 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm p-2 rounded-full shadow-sm hover:scale-110 transition-transform border border-slate-100 dark:border-slate-700"
+                      title={savedDishIds.has(dishes[activeDishIndex].id) ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      <Bookmark
+                        className={`w-4 h-4 ${savedDishIds.has(dishes[activeDishIndex].id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`}
+                      />
+                    </button>
                   </div>
-                </div>
+                ) : (
+                  /* Fallback when no image */
+                  <div className="w-full md:w-2/5 lg:w-1/3 shrink-0 aspect-[4/3] md:aspect-square rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex flex-col items-center justify-center relative">
+                    <div className="absolute top-3 left-3 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase text-primary-600 shadow-sm border border-slate-100 dark:border-slate-600">
+                      {dishes[activeDishIndex].category}
+                    </div>
+                    <span className="text-4xl">🍽️</span>
+                    <span className="text-slate-400 mt-2 text-sm font-medium">No image</span>
+                  </div>
+                )}
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-700 dark:text-slate-200">Any comments? (Optional)</label>
-                  <textarea
-                    className="input-field min-h-[80px] resize-none"
-                    placeholder="E.g., A bit too spicy, perfect consistency..."
-                    value={ratings[dishes[activeDishIndex].id]?.comment || ''}
-                    onChange={(e) => handleCommentChange(dishes[activeDishIndex].id, e.target.value)}
-                  />
+                {/* Right: Content & Rating */}
+                <div className="flex-1 w-full flex flex-col min-w-0">
+                  <div className="flex justify-between items-start gap-4 mb-1">
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight leading-tight">
+                      {dishes[activeDishIndex].displayName || dishes[activeDishIndex].name}
+                    </h2>
+                    <button
+                      onClick={() => setIsDetailsModalOpen(true)}
+                      className="shrink-0 p-1.5 sm:p-2 text-slate-400 hover:text-primary-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+                      title="View Details"
+                    >
+                      <Info className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col gap-4 mt-4">
+                    {/* Stars Container */}
+                    <div className="border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 rounded-2xl p-4 sm:p-5 flex flex-col items-center justify-center shadow-sm">
+                      <p className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-3">
+                        How did you like this dish?
+                      </p>
+                      <div className="flex gap-2 sm:gap-4">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <button
+                            key={star}
+                            onClick={() => handleRatingChange(dishes[activeDishIndex].id, star)}
+                            className="group relative p-1.5 sm:p-2 transition-all hover:scale-110 focus:outline-none"
+                          >
+                            <Star 
+                              className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors duration-300 ${
+                                (ratings[dishes[activeDishIndex].id]?.rating || 0) >= star
+                                  ? 'fill-amber-400 text-amber-400 drop-shadow-sm'
+                                  : 'fill-slate-100 text-slate-200 dark:fill-slate-800 dark:text-slate-700 group-hover:fill-amber-100 group-hover:text-amber-200'
+                              }`} 
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Comment Box */}
+                    <div className="relative group">
+                      <textarea
+                        className="input-field min-h-[70px] resize-none border-slate-200 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 transition-all rounded-2xl py-3 px-4 text-sm"
+                        placeholder="Any comments? (Optional)"
+                        value={ratings[dishes[activeDishIndex].id]?.comment || ''}
+                        onChange={(e) => handleCommentChange(dishes[activeDishIndex].id, e.target.value)}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </motion.div>
