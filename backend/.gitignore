@@ -8,3 +8,6 @@ HELP.md
 .classpath
 .project
 .settings/
+
+.env
+.env.*
