@@ -19,6 +19,7 @@ public class CampDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Camp.CampDuration duration;
+    private Integer customDays;
     private boolean active;
     private LocalDateTime createdAt;
 }

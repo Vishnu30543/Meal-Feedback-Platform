@@ -10,7 +10,7 @@ import BulkAddModal from '../../components/forms/BulkAddModal';
 export default function Residents() {
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState('');
-  const [activeCampOnly, setActiveCampOnly] = useState(false);
+  const [activeCampOnly, setActiveCampOnly] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
   const [selectedResident, setSelectedResident] = useState<any>(null);

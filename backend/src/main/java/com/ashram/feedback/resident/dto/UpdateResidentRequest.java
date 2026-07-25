@@ -12,4 +12,8 @@ public class UpdateResidentRequest {
     private String name;
 
     private String phone;
+    
+    private String duration;
+    
+    private Integer customDays;
 }

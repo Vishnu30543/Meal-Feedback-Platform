@@ -173,16 +173,12 @@ public class ResidentService {
                 java.util.Optional<Resident> existingOpt = residentRepository.findByResidentCode(residentCode);
                 if (existingOpt.isPresent()) {
                     Resident existing = existingOpt.get();
-                    if (existing.isArchived()) {
-                        // Unarchive and update
-                        existing.setArchived(false);
-                        if (name != null) existing.setName(name);
-                        if (phone != null) existing.setPhone(phone);
-                        if (doj != null) existing.setDoj(doj);
-                        resident = residentRepository.save(existing);
-                    } else {
-                        continue; // Skip active existing to avoid duplicates in bulk upload
-                    }
+                    // Always update info on bulk upload
+                    existing.setArchived(false);
+                    if (name != null) existing.setName(name);
+                    if (phone != null) existing.setPhone(phone);
+                    if (doj != null) existing.setDoj(doj);
+                    resident = residentRepository.save(existing);
                 } else {
                     resident = new Resident();
                     resident.setResidentCode(residentCode);
@@ -196,33 +192,61 @@ public class ResidentService {
                     Camp.CampDuration durationEnum = null;
                     Integer customDays = null;
 
-                    // Match string to duration or custom
-                    String durUpper = durationStr.trim().toUpperCase();
-                    if (durUpper.equals("15") || durUpper.contains("FIFTEEN") || durUpper.contains("15 DAYS")) durationEnum = Camp.CampDuration.FIFTEEN;
-                    else if (durUpper.equals("30") || durUpper.contains("THIRTY") || durUpper.contains("30 DAYS")) durationEnum = Camp.CampDuration.THIRTY;
-                    else if (durUpper.equals("60") || durUpper.contains("SIXTY") || durUpper.contains("60 DAYS")) durationEnum = Camp.CampDuration.SIXTY;
-                    else if (durUpper.equals("90") || durUpper.contains("NINETY") || durUpper.contains("90 DAYS")) durationEnum = Camp.CampDuration.NINETY;
-                    else if (durUpper.contains("PERMANENT")) durationEnum = Camp.CampDuration.PERMANENT;
-                    else {
-                        durationEnum = Camp.CampDuration.CUSTOM;
-                        try {
-                            customDays = Integer.parseInt(durationStr.replaceAll("[^0-9]", ""));
-                        } catch (Exception e) {
-                            customDays = 30; // fallback if parse fails
+                    try {
+                        String cleanStr = durationStr.replaceAll("[^0-9.]", "");
+                        if (cleanStr.isEmpty() || cleanStr.equals(".")) {
+                            throw new NumberFormatException("Empty number");
+                        }
+                        int daysValue = (int) Math.round(Double.parseDouble(cleanStr));
+                        
+                        if (daysValue == 15) durationEnum = Camp.CampDuration.FIFTEEN;
+                        else if (daysValue == 30) durationEnum = Camp.CampDuration.THIRTY;
+                        else if (daysValue == 60) durationEnum = Camp.CampDuration.SIXTY;
+                        else if (daysValue == 90) durationEnum = Camp.CampDuration.NINETY;
+                        else {
+                            durationEnum = Camp.CampDuration.CUSTOM;
+                            customDays = daysValue;
+                        }
+                    } catch (Exception e) {
+                        if (durationStr != null && durationStr.toUpperCase().contains("PERMANENT")) {
+                            durationEnum = Camp.CampDuration.PERMANENT;
+                        } else {
+                            durationEnum = Camp.CampDuration.CUSTOM;
+                            customDays = 30; // fallback
                         }
                     }
                     LocalDate startDate = doj;
                     int days = durationEnum == Camp.CampDuration.CUSTOM && customDays != null ? customDays : durationEnum.getDays();
                     
-                    Camp camp = Camp.builder()
-                            .resident(resident)
-                            .startDate(startDate)
-                            .endDate(startDate.plusDays(days))
-                            .duration(durationEnum)
-                            .customDays(customDays)
-                            .active(true)
-                            .build();
-                    campRepository.save(camp);
+                    // Deactivate other active camps to prevent overlapping UI confusion
+                    List<Camp> activeCamps = campRepository.findByResidentIdOrderByStartDateDesc(resident.getId());
+                    for (Camp c : activeCamps) {
+                        if (c.isActive() && !c.getStartDate().equals(startDate)) {
+                            c.setActive(false);
+                            campRepository.save(c);
+                        }
+                    }
+                    
+                    // Upsert camp
+                    java.util.Optional<Camp> existingCampOpt = campRepository.findByResidentIdAndStartDate(resident.getId(), startDate);
+                    if (existingCampOpt.isPresent()) {
+                        Camp existingCamp = existingCampOpt.get();
+                        existingCamp.setDuration(durationEnum);
+                        existingCamp.setCustomDays(customDays);
+                        existingCamp.setEndDate(startDate.plusDays(days));
+                        existingCamp.setActive(true);
+                        campRepository.save(existingCamp);
+                    } else {
+                        Camp camp = Camp.builder()
+                                .resident(resident)
+                                .startDate(startDate)
+                                .endDate(startDate.plusDays(days))
+                                .duration(durationEnum)
+                                .customDays(customDays)
+                                .active(true)
+                                .build();
+                        campRepository.save(camp);
+                    }
                 }
                 count++;
             }
@@ -235,7 +259,23 @@ public class ResidentService {
     private String getCellStringValue(Cell cell) {
         if (cell == null) return null;
         if (cell.getCellType() == CellType.NUMERIC) {
-            return String.valueOf((long) cell.getNumericCellValue());
+            double num = cell.getNumericCellValue();
+            if (num == Math.floor(num)) {
+                return String.valueOf((long) num);
+            }
+            return String.valueOf(num);
+        } else if (cell.getCellType() == CellType.FORMULA) {
+            try {
+                return cell.getStringCellValue();
+            } catch (Exception e) {
+                try {
+                    double num = cell.getNumericCellValue();
+                    if (num == Math.floor(num)) return String.valueOf((long) num);
+                    return String.valueOf(num);
+                } catch (Exception ex) {
+                    return "";
+                }
+            }
         }
         return cell.getStringCellValue();
     }
@@ -252,6 +292,27 @@ public class ResidentService {
         }
         if (request.getPhone() != null) {
             resident.setPhone(request.getPhone());
+        }
+
+        if (request.getDuration() != null && !request.getDuration().trim().isEmpty()) {
+            try {
+                Camp.CampDuration durationEnum = Camp.CampDuration.valueOf(request.getDuration());
+                java.util.Optional<Camp> activeCampOpt = campRepository.findByResidentIdAndActiveTrue(id);
+                if (activeCampOpt.isPresent()) {
+                    Camp camp = activeCampOpt.get();
+                    camp.setDuration(durationEnum);
+                    if (durationEnum == Camp.CampDuration.CUSTOM) {
+                        camp.setCustomDays(request.getCustomDays() != null ? request.getCustomDays() : 30);
+                    } else {
+                        camp.setCustomDays(null);
+                    }
+                    int days = durationEnum == Camp.CampDuration.CUSTOM ? camp.getCustomDays() : durationEnum.getDays();
+                    camp.setEndDate(camp.getStartDate().plusDays(days));
+                    campRepository.save(camp);
+                }
+            } catch (Exception e) {
+                log.warn("Invalid duration provided for update: {}", request.getDuration());
+            }
         }
 
         resident = residentRepository.save(resident);
@@ -376,7 +437,11 @@ public class ResidentService {
         List<DateTimeFormatter> formatters = Arrays.asList(
             DateTimeFormatter.ofPattern("dd-MM-yyyy"),
             DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("MM-dd-yyyy")
+            DateTimeFormatter.ofPattern("MM-dd-yyyy"),
+            DateTimeFormatter.ofPattern("d-M-yyyy"),
+            DateTimeFormatter.ofPattern("dd-MMM-yyyy", java.util.Locale.ENGLISH),
+            DateTimeFormatter.ofPattern("d-MMM-yyyy", java.util.Locale.ENGLISH),
+            DateTimeFormatter.ofPattern("dd-MMMM-yyyy", java.util.Locale.ENGLISH)
         );
         for (DateTimeFormatter formatter : formatters) {
             try {
