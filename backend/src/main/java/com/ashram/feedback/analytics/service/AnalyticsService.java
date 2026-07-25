@@ -54,7 +54,7 @@ public class AnalyticsService {
         LocalDate today = LocalDate.now();
 
         boolean published = menuRepository.findPublishedByDate(today).isPresent();
-        long activeResidents = campRepository.countActiveCamps();
+        long activeResidents = campRepository.countActiveCampsByDate(today);
         long totalDishes = dishRepository.countByStatus(DishStatus.ACTIVE);
 
         long residentsRated = 0;
@@ -118,7 +118,7 @@ public class AnalyticsService {
 
         // Active residents
         List<Resident> activeResidents = residentRepository.findAll().stream()
-                .filter(r -> !r.isArchived())
+                .filter(r -> !r.isArchived() && campRepository.hasActiveCamp(r.getId(), today))
                 .collect(Collectors.toList());
 
         return activeResidents.stream()
@@ -241,10 +241,10 @@ public class AnalyticsService {
         if (startDate == null) startDate = LocalDate.now().minusDays(14);
         if (endDate == null) endDate = LocalDate.now();
 
-        long activeResidents = campRepository.countActiveCamps();
         List<DailyTrendDto> trends = new ArrayList<>();
 
         for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
+            long activeResidents = campRepository.countActiveCampsByDate(d);
             Optional<DailyMenu> menuOpt = menuRepository.findByMenuDate(d);
             long rated = 0;
             Double avgOverall = null;

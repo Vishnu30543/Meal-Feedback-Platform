@@ -25,7 +25,7 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Ashram Admin")
-                                .email("admin@ashram.com")))
+                                .email("vs@ashram.com")))
                 .addSecurityItem(new SecurityRequirement()
                         .addList(securitySchemeName))
                 .components(new Components()

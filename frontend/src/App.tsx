@@ -25,6 +25,7 @@ const DishComparison = lazy(() => import('./pages/admin/DishComparison'));
 const FeedbackSearch = lazy(() => import('./pages/admin/FeedbackSearch'));
 const TodayDishFeedback = lazy(() => import('./pages/admin/TodayDishFeedback'));
 const AdminTopDishes = lazy(() => import('./pages/admin/TopDishes'));
+const FeedbackStatusList = lazy(() => import('./pages/admin/FeedbackStatusList'));
 
 // Resident pages
 const ResidentDashboard = lazy(() => import('./pages/resident/Dashboard'));
@@ -79,6 +80,7 @@ function App() {
           <Route path="analytics/comparison" element={<DishComparison />} />
           <Route path="analytics/search" element={<FeedbackSearch />} />
           <Route path="analytics/today-feedback" element={<TodayDishFeedback />} />
+          <Route path="analytics/feedback-status" element={<FeedbackStatusList />} />
           <Route path="top-dishes" element={<AdminTopDishes />} />
         </Route>
 

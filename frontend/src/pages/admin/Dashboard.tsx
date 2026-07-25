@@ -6,6 +6,7 @@ import {
   Activity, AlertCircle, Clock, BarChart2, Percent, Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 export default function AdminDashboard() {
   const [hoveredDayIndex, setHoveredDayIndex] = useState<number | null>(null);
@@ -234,9 +235,14 @@ export default function AdminDashboard() {
 
       {/* Today's Feedback Status Table */}
       <div className="card overflow-hidden">
-        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-2">
-          <CheckCircle className="w-5 h-5 text-primary-500" />
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Today's Feedback Status</h3>
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="w-5 h-5 text-primary-500" />
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Today's Feedback Status</h3>
+          </div>
+          <Link to="/admin/analytics/feedback-status" className="text-sm font-semibold text-primary-600 hover:text-primary-500 transition-colors">
+            View All
+          </Link>
         </div>
 
         {loadingStatus ? (
@@ -256,7 +262,7 @@ export default function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                {feedbackStatus.map((row: any, i: number) => (
+                {feedbackStatus.slice(0, 5).map((row: any, i: number) => (
                   <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
                     <td className="px-6 py-3 font-mono text-xs font-semibold text-slate-600 dark:text-slate-300">{row.residentCode}</td>
                     <td className="px-6 py-3 font-medium text-slate-700 dark:text-slate-200">{row.residentName}</td>

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { useAuth } from '../../context/AuthContext';
-import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, Megaphone } from 'lucide-react';
+import { ChevronRight, Star, Utensils, Bookmark, Info, Clock, Check, Bell, Megaphone, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { Link } from 'react-router-dom';
 import DishDetailsModal from '../../components/DishDetailsModal';
@@ -83,21 +83,27 @@ export default function ResidentDashboard() {
     <div className="space-y-6 animate-in fade-in duration-500">
 
       {/* Welcome Banner */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden shadow-sm">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
+      <div className="group bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700/50 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-500">
+        {/* Animated Background Gradients */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 dark:bg-primary-500/20 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none group-hover:bg-primary-500/20 dark:group-hover:bg-primary-500/30 transition-colors duration-700" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none" />
+        
         <div className="relative z-10 flex-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-semibold mb-3 border border-primary-100 dark:border-primary-500/20">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-50/80 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 text-sm font-bold mb-4 border border-primary-100/50 dark:border-primary-500/20 backdrop-blur-sm shadow-sm">
+            <Sparkles className="w-4 h-4" />
             <span>Welcome Back</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-3">
             Namaskaram, {user?.name?.split(' ')[0] || 'Sadhaka'}!
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base max-w-xl leading-relaxed">
+          <p className="text-slate-600 dark:text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
             Your feedback helps us provide the most healthy and satvik food for everyone in the ashram.
           </p>
         </div>
-        <div className="hidden sm:flex relative z-10 w-16 h-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary-50 to-primary-100 dark:from-slate-800 dark:to-slate-700 items-center justify-center border border-primary-200 dark:border-slate-700 shadow-sm rotate-3 hover:rotate-6 transition-transform">
-            <span className="text-2xl">🙏</span>
+        
+        <div className="hidden sm:flex relative z-10 w-20 h-20 shrink-0 rounded-2xl bg-gradient-to-br from-white to-primary-50 dark:from-slate-800 dark:to-slate-900 items-center justify-center border border-slate-100 dark:border-slate-700 shadow-xl rotate-3 group-hover:rotate-6 group-hover:scale-105 transition-transform transform-gpu duration-500">
+            <span className="text-4xl drop-shadow-md">🙏</span>
+            <div className="absolute inset-0 rounded-2xl border border-white/50 dark:border-white/5 pointer-events-none"></div>
         </div>
       </div>
 
@@ -125,56 +131,59 @@ export default function ResidentDashboard() {
       )}
 
       {/* Action Card: Today's Rating */}
-      <div className="card p-1">
-        <div className="bg-white dark:bg-slate-800 rounded-[15px] p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="relative group overflow-hidden rounded-3xl bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700/50 shadow-lg hover:shadow-xl transition-shadow duration-300">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-500/5 via-transparent to-primary-500/5 dark:from-primary-500/10 dark:to-primary-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="relative p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8">
           <div className="flex-1 w-full">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+            <div className="flex items-center gap-3 mb-2">
+              <h3 className="text-xl sm:text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
                 {progress?.totalDishes > 0 && !progress?.editable 
                   ? 'Camp Session Completed' 
                   : 'Daily Meal Feedback'}
               </h3>
               {progress?.totalDishes > 0 && progress?.editable && (progress.ratedDishes < progress.totalDishes || !progress.overallRated) && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                  <Bell className="w-3 h-3" /> Pending
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400 border border-amber-200 dark:border-amber-500/30 shadow-sm animate-pulse">
+                  <Bell className="w-3.5 h-3.5" /> Pending
                 </span>
               )}
             </div>
             {progress?.totalDishes > 0 ? (
               <div>
                 {!progress?.editable ? (
-                  <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
+                  <p className="text-slate-500 dark:text-slate-400 text-base mb-4">
                     Thank you for sharing your feedback during your stay.
                   </p>
                 ) : (
                   <>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-3">
-                      Reviewed <span className="font-semibold text-slate-800 dark:text-slate-100">{progress?.ratedDishes} of {progress?.totalDishes}</span> dishes
+                    <p className="text-slate-600 dark:text-slate-300 text-base mb-4">
+                      Reviewed <span className="font-bold text-slate-800 dark:text-slate-100">{progress?.ratedDishes}</span> of <span className="font-bold text-slate-800 dark:text-slate-100">{progress?.totalDishes}</span> items
                     </p>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 mb-2 overflow-hidden">
+                    <div className="w-full bg-slate-100 dark:bg-slate-800/80 rounded-full h-3 mb-2 overflow-hidden shadow-inner border border-slate-200 dark:border-slate-700/50">
                       <div
-                        className="bg-primary-500 h-2 rounded-full transition-all duration-1000 ease-out"
+                        className="bg-gradient-to-r from-primary-400 to-primary-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(34,197,94,0.4)] dark:shadow-[0_0_12px_rgba(34,197,94,0.3)] relative overflow-hidden"
                         style={{ width: `${(progress.ratedDishes / progress.totalDishes) * 100}%` }}
-                      />
+                      >
+                         <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></div>
+                      </div>
                     </div>
                   </>
                 )}
               </div>
             ) : (
-              <p className="text-slate-500 dark:text-slate-400 text-sm">Menu not available yet</p>
+              <p className="text-slate-500 dark:text-slate-400 text-base">Menu not available yet</p>
             )}
           </div>
 
           <Link
             to="/resident/menu/today"
-            className={`w-full sm:w-auto shrink-0 flex items-center justify-center px-6 py-3 rounded-xl font-medium transition-all ${
+            className={`w-full sm:w-auto shrink-0 flex items-center justify-center px-8 py-4 rounded-2xl font-bold transition-all transform-gpu duration-300 active:scale-95 ${
               progress?.totalDishes > 0
                 ? !progress?.editable
-                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                  ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-700'
                   : progress?.ratedDishes === progress?.totalDishes
-                    ? 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'
-                    : 'bg-primary-600 text-white shadow-md hover:bg-primary-700 hover:shadow-lg'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg shadow-green-500/25 hover:shadow-green-500/40 hover:-translate-y-0.5 border border-green-400/50'
+                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 border border-primary-400/50'
+                : 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 cursor-not-allowed border border-slate-200 dark:border-slate-700'
             }`}
             onClick={(e) => {
               if (!progress?.totalDishes || !progress?.editable) e.preventDefault();
@@ -186,7 +195,7 @@ export default function ResidentDashboard() {
                 : progress?.ratedDishes === progress?.totalDishes ? 'Review Ratings' : 'Rate Now'
               : 'Waiting...'
             }
-            <ChevronRight className="w-5 h-5 ml-1" />
+            <ChevronRight className="w-5 h-5 ml-1.5" />
           </Link>
         </div>
       </div>
@@ -195,69 +204,78 @@ export default function ResidentDashboard() {
 
       {/* Today's Menu Display */}
       {loadingMenu ? (
-        <div className="card p-6">
-          <div className="h-5 w-44 bg-slate-200 dark:bg-slate-700 rounded animate-pulse mb-4"></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4 mt-8">
+          <div className="h-6 w-48 bg-slate-200 dark:bg-slate-700/50 rounded-md animate-pulse mb-2 ml-1"></div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {[1, 2].map(i => (
-              <div key={i} className="card overflow-hidden bg-slate-50 dark:bg-slate-800/50">
-                <div className="h-40 bg-slate-200 dark:bg-slate-700 animate-pulse"></div>
-                <div className="p-4 space-y-2">
-                  <div className="h-4 w-3/4 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+              <div key={i} className="rounded-3xl overflow-hidden bg-white/50 dark:bg-slate-900/40 backdrop-blur-sm border border-slate-200/60 dark:border-slate-700/50">
+                <div className="h-48 bg-slate-200/80 dark:bg-slate-800/80 animate-pulse"></div>
+                <div className="p-5 space-y-3">
+                  <div className="h-4 w-3/4 bg-slate-200/80 dark:bg-slate-700/80 rounded-md animate-pulse"></div>
+                  <div className="h-3 w-full bg-slate-200/80 dark:bg-slate-700/80 rounded-md animate-pulse"></div>
                 </div>
               </div>
             ))}
           </div>
         </div>
       ) : menu?.dishes && menu.dishes.length > 0 && (
-        <div className="card p-6">
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-            <Utensils className="w-5 h-5 text-primary-500" />
-            Explore Today's Menu
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4 mt-8">
+          <div className="flex items-center gap-2 mb-2 px-1">
+            <div className="p-1.5 rounded-lg bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400">
+              <Utensils className="w-5 h-5" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 tracking-tight">
+              Explore Today's Menu
+            </h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {menu.dishes.map((md: any, idx: number) => (
-              <div key={idx} className="card overflow-hidden bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
-                <div className="h-44 relative overflow-hidden bg-slate-50 dark:bg-slate-800 group-hover:bg-slate-100 transition-colors">
+              <div key={idx} className="group flex flex-col rounded-3xl overflow-hidden bg-white dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-700/50 shadow-sm hover:shadow-lg transition-shadow duration-300">
+                <div className="h-48 relative overflow-hidden bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-200 transition-colors">
                   {md.dish.primaryImageUrl || md.dish.imageUrl ? (
-                    <img src={md.dish.primaryImageUrl || md.dish.imageUrl} alt={md.dish.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={md.dish.primaryImageUrl || md.dish.imageUrl} alt={md.dish.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform transform-gpu duration-700 ease-out" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500">
-                      <Utensils className="w-10 h-10 mb-2 opacity-50" />
-                      <span className="text-[10px] font-medium uppercase tracking-wider opacity-60">No Image</span>
+                      <Utensils className="w-12 h-12 mb-3 opacity-40" />
+                      <span className="text-xs font-bold uppercase tracking-widest opacity-50">No Image</span>
                     </div>
                   )}
-                  <div className="absolute top-2 left-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold text-primary-700 shadow-sm">
+                  {/* Category Badge */}
+                  <div className="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold text-primary-600 dark:text-primary-400 shadow-sm border border-white/20 dark:border-slate-700/50">
                     {md.dish.category}
                   </div>
+                  {/* Save Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSaveMutation.mutate(md.dish.id);
                     }}
-                    className="absolute top-2 right-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm p-1.5 rounded-full shadow-sm hover:scale-110 transition-transform"
+                    className="absolute top-3 right-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-2 rounded-xl shadow-sm hover:scale-110 active:scale-95 transition-all transform-gpu border border-white/20 dark:border-slate-700/50"
                     title={savedDishIds.has(md.dish.id) ? "Remove from saved" : "Save for later"}
                   >
                     <Bookmark
                       className={`w-4 h-4 ${savedDishIds.has(md.dish.id) ? 'fill-primary-500 text-primary-500' : 'text-slate-600 dark:text-slate-300'}`}
                     />
                   </button>
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
-                <div className="p-4">
-                  <div className="flex justify-between items-start mb-1">
-                    <h4 className="font-semibold text-slate-800 dark:text-slate-100 text-sm">{md.dish.displayName || md.dish.name}</h4>
+                
+                <div className="p-5 flex-1 flex flex-col bg-transparent">
+                  <div className="flex justify-between items-start mb-2 gap-3">
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100 text-base leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">{md.dish.displayName || md.dish.name}</h4>
                     <button
                       onClick={() => {
                         setSelectedDish(md.dish);
                         setIsModalOpen(true);
                       }}
-                      className="text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 p-1 rounded transition-colors"
+                      className="text-slate-400 hover:text-primary-600 bg-slate-50 hover:bg-primary-50 dark:bg-slate-800 dark:hover:bg-primary-900/30 p-1.5 rounded-lg transition-colors border border-transparent dark:border-slate-700 hover:border-primary-100 dark:hover:border-primary-500/30"
                       title="View Details"
                     >
                       <Info className="w-4 h-4" />
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-500 line-clamp-2">{md.dish.description}</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mt-auto leading-relaxed">{md.dish.description}</p>
                 </div>
               </div>
             ))}

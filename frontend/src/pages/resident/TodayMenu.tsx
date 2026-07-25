@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../api/axios';
 import { ChevronLeft, Star, Send, CheckCircle, Info, Bookmark } from 'lucide-react';
@@ -52,6 +52,27 @@ export default function TodayMenu() {
     queryKey: ['menu', todayStr],
     queryFn: () => api.get(`/menus/date/${todayStr}`).then(res => res.data)
   });
+
+  const { data: existingRatings, isLoading: loadingRatings } = useQuery({
+    queryKey: ['myRatings', menu?.id],
+    queryFn: () => api.get(`/ratings/menu/${menu.id}`).then(res => res.data),
+    enabled: !!menu?.id
+  });
+
+  useEffect(() => {
+    if (existingRatings) {
+      const initialRatings: Record<number, { rating: number, comment: string }> = {};
+      existingRatings.dishRatings?.forEach((dr: any) => {
+        initialRatings[dr.dishId] = { rating: dr.rating, comment: dr.comment || '' };
+      });
+      setRatings(initialRatings);
+      
+      if (existingRatings.overallRating) {
+        setOverallRating(existingRatings.overallRating.rating);
+        setOverallComment(existingRatings.overallRating.comment || '');
+      }
+    }
+  }, [existingRatings]);
 
   const dishes = menu?.dishes?.map((md: any) => md.dish) || [];
   
@@ -107,7 +128,7 @@ export default function TodayMenu() {
     }
   };
 
-  if (isLoading) return <div className="text-center py-10">Loading Menu...</div>;
+  if (isLoading || loadingRatings) return <div className="text-center py-10">Loading Menu...</div>;
   if (!menu || dishes.length === 0) return (
     <div className="card p-8 text-center mt-6">
       <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">No Menu Today</h2>
