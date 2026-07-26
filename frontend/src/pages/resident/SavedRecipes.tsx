@@ -8,7 +8,7 @@ export default function SavedRecipes() {
   const [selectedDish, setSelectedDish] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingRemovals, setPendingRemovals] = useState<Set<number>>(new Set());
-  const timeoutsRef = useRef<{ [key: number]: NodeJS.Timeout }>({});
+  const timeoutsRef = useRef<{ [key: number]: ReturnType<typeof setTimeout> }>({});
   const queryClient = useQueryClient();
 
   const { data: saved, isLoading } = useQuery({
