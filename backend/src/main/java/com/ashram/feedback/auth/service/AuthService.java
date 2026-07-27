@@ -1,5 +1,12 @@
 package com.ashram.feedback.auth.service;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.ashram.feedback.auth.dto.AdminLoginRequest;
 import com.ashram.feedback.auth.dto.AuthResponse;
 import com.ashram.feedback.auth.dto.ResidentLoginRequest;
@@ -13,14 +20,9 @@ import com.ashram.feedback.resident.entity.Camp;
 import com.ashram.feedback.resident.entity.Resident;
 import com.ashram.feedback.resident.repository.CampRepository;
 import com.ashram.feedback.resident.repository.ResidentRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service

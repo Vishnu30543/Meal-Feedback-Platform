@@ -1,12 +1,12 @@
 package com.ashram.feedback.favourite.repository;
 
-import com.ashram.feedback.favourite.entity.FavouriteDish;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.ashram.feedback.favourite.entity.FavouriteDish;
 
 @Repository
 public interface FavouriteDishRepository extends JpaRepository<FavouriteDish, Long> {
