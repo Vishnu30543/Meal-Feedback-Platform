@@ -8,4 +8,5 @@ public class AISettingsDto {
     private Integer minimumRatings;
     private boolean aiEnabled;
     private String recommendationType;
+    private Integer onboardingFeedbackDays;
 }

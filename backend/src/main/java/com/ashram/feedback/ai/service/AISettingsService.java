@@ -26,11 +26,15 @@ public class AISettingsService {
         settings.setMinimumRatings(dto.getMinimumRatings());
         settings.setAiEnabled(dto.isAiEnabled());
         settings.setRecommendationType(dto.getRecommendationType());
+        if (dto.getOnboardingFeedbackDays() != null) {
+            settings.setOnboardingFeedbackDays(dto.getOnboardingFeedbackDays());
+        }
         return toDto(repository.save(settings));
     }
 
     private AISettingsDto toDto(AISettings s) {
         return AISettingsDto.builder().id(s.getId()).minimumRatings(s.getMinimumRatings())
-                .aiEnabled(s.isAiEnabled()).recommendationType(s.getRecommendationType()).build();
+                .aiEnabled(s.isAiEnabled()).recommendationType(s.getRecommendationType())
+                .onboardingFeedbackDays(s.getOnboardingFeedbackDays()).build();
     }
 }

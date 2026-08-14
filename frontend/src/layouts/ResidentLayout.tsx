@@ -3,6 +3,9 @@ import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
 import { Home, Star, LogOut, Utensils, Trophy } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import api from '../api/axios';
+import OnboardingFeedbackModal from '../components/resident/OnboardingFeedbackModal';
 
 export default function ResidentLayout() {
   const { user, logout } = useAuth();
@@ -14,6 +17,12 @@ export default function ResidentLayout() {
     { name: 'Top Dishes', path: '/resident/top-dishes', icon: Trophy },
     { name: 'Saved', path: '/resident/saved', icon: Utensils },
   ];
+
+  const { data: feedbackCheck } = useQuery({
+    queryKey: ['onboardingFeedbackCheck'],
+    queryFn: () => api.get('/onboarding-feedback/check').then(res => res.data ?? res),
+    enabled: !!user
+  });
 
   return (
     <div className="min-h-screen bg-background dark:bg-slate-900 transition-colors duration-300 pb-20 sm:pb-0 sm:pt-32">
@@ -74,6 +83,12 @@ export default function ResidentLayout() {
           })}
         </div>
       </nav>
+
+      {feedbackCheck?.needsFeedback && (
+        <OnboardingFeedbackModal onClose={() => {
+          // Handled by invalidateQueries in modal
+        }} />
+      )}
     </div>
   );
 }

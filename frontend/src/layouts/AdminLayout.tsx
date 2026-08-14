@@ -32,6 +32,7 @@ export default function AdminLayout() {
     { name: 'Dish Analytics', path: '/admin/analytics/dishes', icon: TrendingUp },
     { name: 'Dish Comparison', path: '/admin/analytics/comparison', icon: GitCompare },
     { name: 'Comment Search', path: '/admin/analytics/search', icon: MessageSquare },
+    { name: 'Onboarding Feedback', path: '/admin/analytics/onboarding', icon: Users },
   ];
 
   const isActive = (path: string, exact = false) => {

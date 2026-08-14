@@ -46,7 +46,7 @@ export default function Settings() {
         </div>
         
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-6">
             <div>
               <label className="font-medium text-slate-800 dark:text-slate-100 block">Enable AI Suggestions</label>
               <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mt-1">
@@ -59,7 +59,7 @@ export default function Settings() {
             </label>
           </div>
 
-          <div>
+          <div className="border-b border-slate-100 dark:border-slate-700 pb-6">
             <label className="font-medium text-slate-800 dark:text-slate-100 block mb-1">Minimum Ratings Threshold</label>
             <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-3">
               Minimum number of dish ratings required before the AI considers the data statistically significant.
@@ -68,6 +68,18 @@ export default function Settings() {
               type="number" 
               className="input-field max-w-[200px]"
               {...register('minimumRatings', { valueAsNumber: true })}
+            />
+          </div>
+
+          <div className="pb-4">
+            <label className="font-medium text-slate-800 dark:text-slate-100 block mb-1">Onboarding Feedback Active Days</label>
+            <p className="text-sm text-slate-500 dark:text-slate-400 dark:text-slate-500 mb-3">
+              Number of days from Date of Joining (DOJ) to show the onboarding feedback form to a resident.
+            </p>
+            <input 
+              type="number" 
+              className="input-field max-w-[200px]"
+              {...register('onboardingFeedbackDays', { valueAsNumber: true, min: 1 })}
             />
           </div>
 

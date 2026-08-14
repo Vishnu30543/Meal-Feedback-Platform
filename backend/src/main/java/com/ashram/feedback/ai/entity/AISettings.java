@@ -23,6 +23,9 @@ public class AISettings {
     @Column(name = "recommendation_type")
     private String recommendationType;  // Future placeholder
 
+    @Column(name = "onboarding_feedback_days") @Builder.Default
+    private Integer onboardingFeedbackDays = 2;
+
     @LastModifiedDate @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }
