@@ -152,6 +152,7 @@ public class DishController {
                     updateReq.setHealthBenefits(req.getHealthBenefits());
                     updateReq.setYoutubeUrl(req.getYoutubeUrl());
                     updateReq.setStatus(DishStatus.ACTIVE);
+                    updateReq.setImageUrls(req.getImageUrls());
                     updateReq.setRecipe(req.getRecipe());
                     updateReq.setNutrition(req.getNutrition());
                     updateReq.setAllergen(req.getAllergen());

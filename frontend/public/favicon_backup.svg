@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- Background Gradient (Slate-900 to Emerald-900) -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#064e3b"/>
+    </linearGradient>
+    
+    <!-- Leaf Gradient (Emerald-400 to Emerald-600) -->
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    
+    <!-- Bowl Gradient (Amber-400 to Amber-600) -->
+    <linearGradient id="bowl" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- App Icon Rounded Square Background -->
+  <rect width="100" height="100" rx="24" fill="url(#bg)" />
+
+  <!-- The Leaf (Satvik/Healthy motif) -->
+  <path d="M50,15 C32,15 36,45 50,52 C64,45 68,15 50,15 Z" fill="url(#leaf)" />
+
+  <!-- The Bowl (Food/Serving motif) -->
+  <path d="M22,55 L78,55 A28,28 0 0,1 50,83 A28,28 0 0,1 22,55 Z" fill="url(#bowl)" />
+  
+  <!-- Subtle shine on bowl -->
+  <path d="M28,58 A22,22 0 0,0 72,58 Z" fill="#ffffff" opacity="0.15" />
+</svg>

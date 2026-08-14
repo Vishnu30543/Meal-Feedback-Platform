@@ -19,7 +19,10 @@ export default function ResidentLayout() {
     <div className="min-h-screen bg-background dark:bg-slate-900 transition-colors duration-300 pb-20 sm:pb-0 sm:pt-32">
       {/* Top Header (Mobile & Desktop) */}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white dark:bg-slate-900 shadow-sm z-30 flex items-center justify-between px-4 sm:px-8 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
-        <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500 truncate">Manthena Ashram</h1>
+        <div className="flex items-center gap-3">
+          <img src="/manthena.jpg" alt="Manthena Ashram" className="w-9 h-9 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm" />
+          <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500 truncate">Manthena Ashram</h1>
+        </div>
         <div className="flex items-center gap-4">
           <ThemeToggle />
           <div className="hidden sm:block text-right mr-2">

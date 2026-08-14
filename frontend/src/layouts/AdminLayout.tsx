@@ -77,7 +77,10 @@ export default function AdminLayout() {
       {/* Sidebar */}
       <div className={`fixed md:static inset-y-0 left-0 z-30 w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-          <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500">Ashram Admin</h1>
+          <div className="flex items-center gap-3">
+            <img src="/manthena.jpg" alt="Manthena Ashram" className="w-8 h-8 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm" />
+            <h1 className="font-bold text-lg text-primary-700 dark:text-primary-500">Ashram Admin</h1>
+          </div>
           <button
             className="md:hidden p-2 -mr-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
             onClick={() => setIsMobileMenuOpen(false)}

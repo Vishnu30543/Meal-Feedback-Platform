@@ -15,7 +15,7 @@ export default function AuthLayout() {
       
       <div className="sm:mx-auto sm:w-full sm:max-w-md relative z-10">
         <div className="flex justify-center mb-6">
-          <img src="/favicon.svg" alt="Ashram Logo" className="w-20 h-20 drop-shadow-xl" />
+          <img src="/manthena.jpg" alt="Manthena Ashram Logo" className="w-20 h-20 rounded-2xl object-cover shadow-xl border-2 border-white/50 dark:border-slate-700" />
         </div>
         <h2 className="text-center text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Manthena Ashram

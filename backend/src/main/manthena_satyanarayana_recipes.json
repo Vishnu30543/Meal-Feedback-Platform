@@ -378,5 +378,81 @@
       "celery": false,
       "sulphites": false
     }
+  },
+  {
+    "name": "Ash Gourd Curry",
+    "displayName": "Boodida Gummadikaya Kura (Zero Oil/Salt/Sugar)",
+    "category": "CURRY",
+    "description": "A deeply cooling, alkalizing ash gourd curry cooked in its own natural juices with freshly grated coconut, slit green chilies, and dry-roasted cumin seeds—strictly zero oil, zero salt, and zero sugar.",
+    "preparationTime": 30,
+    "difficulty": "EASY",
+    "healthBenefits": "Highly alkaline and rich in dietary water and minerals. Cleanses the kidneys, relieves acidity, improves digestion, and supports healthy weight loss.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ash+gourd+curry",
+    "imageUrls": [
+      "/images/dishes/ash-gourd-curry.png"
+    ],
+    "recipe": {
+      "ingredients": "- 2.5 cups fresh Ash Gourd (Boodida Gummadikaya), peeled, seeds removed, and cut into cubes\n- 2 tbsp fresh grated coconut\n- 3-4 green chilies, slit (natural spice without salt)\n- 1/2 tsp cumin seeds (jeera)\n- 1/4 tsp turmeric powder\n- 1 sprig fresh curry leaves\n- 1 tbsp fresh lemon juice\n- 2 tbsp finely chopped fresh coriander leaves",
+      "preparationSteps": "1. Heat a dry, thick-bottomed pot. Add cumin seeds and curry leaves; dry roast for 30 seconds on low flame until aromatic (no oil).\n2. Add slit green chilies and turmeric powder, stirring briefly.\n3. Add the cubed ash gourd and mix well with the roasted spices.\n4. Cover tightly with a lid and cook on low heat. Ash gourd will release its own natural moisture to cook thoroughly.\n5. Simmer for 12-15 minutes until the ash gourd pieces are soft and translucent.\n6. Add freshly grated coconut and gently stir. Cook uncovered for 2 minutes.\n7. Turn off the flame, add fresh lemon juice for natural tanginess, and garnish with chopped coriander leaves before serving.",
+      "preparationNotes": "Strictly Zero Oil, Salt & Sugar: Ash gourd is naturally rich in water. Grated fresh coconut adds gentle natural sweetness and wholesome fats, while green chilies and fresh lemon juice provide balanced flavor without salt.",
+      "healthBenefits": "Alkalizes the digestive system, promotes detoxification, cools body heat, and aids natural weight management.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+ash+gourd+curry"
+    },
+    "nutrition": {
+      "energy": 38.0,
+      "carbohydrates": 4.5,
+      "protein": 1.2,
+      "fat": 1.6,
+      "fiber": 2.2
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": false,
+      "treeNuts": true,
+      "mustard": false,
+      "celery": false,
+      "sulphites": false
+    }
+  },
+  {
+    "name": "Drumstick Curry",
+    "displayName": "Munakkaya Tomato Kura (Zero Oil/Salt/Sugar)",
+    "category": "CURRY",
+    "description": "Tender drumstick (moringa) pods cooked in a juicy tomato, onion, and roasted seed gravy, spiced with dry-roasted cumin and coriander—completely free from oil, salt, and sugar.",
+    "preparationTime": 35,
+    "difficulty": "MEDIUM",
+    "healthBenefits": "Powerhouse of bio-available iron, calcium, and Vitamin C. Strengthens bone density, regulates blood glucose levels, and boosts overall vitality.",
+    "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+drumstick+curry",
+    "imageUrls": [
+      "/images/dishes/drumstick-curry.png"
+    ],
+    "recipe": {
+      "ingredients": "- 3 fresh green Drumsticks (Munakkaya), cut into 2-inch pieces\n- 2 medium ripe tomatoes, finely pureed or chopped\n- 1 medium onion, finely chopped\n- 3-4 green chilies, slit\n- 1 tbsp roasted sesame seed / melon seed powder (or roasted peanut powder)\n- 1/2 tsp cumin seeds\n- 1/4 tsp mustard seeds\n- 1/4 tsp turmeric powder\n- 1 sprig curry leaves\n- 1/2 tsp crushed ginger\n- Fresh coriander leaves for garnish",
+      "preparationSteps": "1. In a pot, cook the drumstick pieces with 1 cup of water and turmeric for 7-8 minutes until tender but intact.\n2. In a heavy-bottomed pan, dry roast mustard seeds, cumin seeds, and curry leaves until they splutter (zero oil).\n3. Add chopped onions and crushed ginger; dry saut\u00e9 on medium flame. Sprinkle 1-2 tbsp water if needed to prevent sticking.\n4. Add pureed tomatoes and slit green chilies. Simmer for 5-6 minutes until tomatoes break down into a thick sauce.\n5. Add the boiled drumsticks along with their remaining cooking water.\n6. Stir in the roasted seed powder to create a rich, natural thickness without any added oil.\n7. Simmer for 5 minutes so the drumsticks absorb all the herbal and tangy flavors.\n8. Turn off the heat and garnish generously with chopped coriander leaves.",
+      "preparationNotes": "Strictly Zero Oil, Salt & Sugar: Fresh drumsticks and ripe tomatoes give natural sweetness and acidity. The roasted seed powder provides creamy richness, replacing the need for cooking oils.",
+      "healthBenefits": "High in calcium and iron for bone and blood health. Helps lower blood sugar and reduces bodily inflammation.",
+      "youtubeUrl": "https://www.youtube.com/results?search_query=manthena+satyanarayana+drumstick+curry"
+    },
+    "nutrition": {
+      "energy": 68.0,
+      "carbohydrates": 8.5,
+      "protein": 3.6,
+      "fat": 2.2,
+      "fiber": 4.0
+    },
+    "allergen": {
+      "milk": false,
+      "gluten": false,
+      "peanut": false,
+      "soy": false,
+      "sesame": true,
+      "treeNuts": false,
+      "mustard": true,
+      "celery": false,
+      "sulphites": false
+    }
   }
 ]
