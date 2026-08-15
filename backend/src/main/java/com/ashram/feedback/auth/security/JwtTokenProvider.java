@@ -27,9 +27,9 @@ public class JwtTokenProvider {
     private final long adminExpirationMs;
 
     public JwtTokenProvider(
-            @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.jwt.expiration-ms}") long jwtExpirationMs,
-            @Value("${app.jwt.admin-expiration-ms}") long adminExpirationMs) {
+            @Value("${app.jwt.secret:YXNocmFtLW1lYWwtZmVlZGJhY2stc3lzdGVtLXNlY3JldC1rZXktMjAyNi1wcm9kdWN0aW9uLXJlYWR5}") String jwtSecret,
+            @Value("${app.jwt.expiration-ms:86400000}") long jwtExpirationMs,
+            @Value("${app.jwt.admin-expiration-ms:28800000}") long adminExpirationMs) {
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
         this.jwtExpirationMs = jwtExpirationMs;
         this.adminExpirationMs = adminExpirationMs;

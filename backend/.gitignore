@@ -1,14 +1,88 @@
+# ============================================
+# Java & Maven Build Output
+# ============================================
 target/
-*.iml
-.idea/
-.vscode/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven release & temporary files
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# ============================================
+# Logs & Crash Dumps
+# ============================================
 logs/
 *.log
-HELP.md
+hs_err_pid*
+replay_pid*
+
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.*
+*.env
+*.pem
+*.key
+
+# ============================================
+# IDEs and Editors
+# ============================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# Eclipse / STS
 .classpath
 .project
 .settings/
+.springBeans
+.sts4-cache/
 
-.env
-.env.*
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# ============================================
+# OS Generated Files
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ============================================
+# Documentation, Temp Schemas & Test Artifacts
+# ============================================
+HELP.md
 schema-docs/
+test_upload.xlsx
+*.xlsx
+*.xls

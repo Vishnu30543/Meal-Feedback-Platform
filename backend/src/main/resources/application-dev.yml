@@ -16,3 +16,13 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# ============================================
+# JWT Configuration
+# ============================================
+app:
+  jwt:
+    secret: ${JWT_SECRET:YXNocmFtLW1lYWwtZmVlZGJhY2stc3lzdGVtLXNlY3JldC1rZXktMjAyNi1wcm9kdWN0aW9uLXJlYWR5}
+    expiration-ms: 86400000  # 24 hours
+    admin-expiration-ms: 28800000  # 8 hours
+
