@@ -5,7 +5,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import {
   LayoutDashboard, LogOut, FileText, Bell, Users, Settings,
   Utensils, Menu, X, BarChart2, ChevronDown, ChevronRight,
-  TrendingUp, GitCompare, MessageSquare
+  TrendingUp, MessageSquare
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -41,7 +41,7 @@ export default function AdminLayout() {
   };
 
   const currentPageName = () => {
-    const allItems = [...navItems, ...analyticsItems];
+    const allItems = [...navItems, ...analyticsItems] as Array<{name: string, path: string, exact?: boolean}>;
     const match = allItems.find(i => isActive(i.path, i.exact));
     return match?.name || 'Dashboard';
   };
