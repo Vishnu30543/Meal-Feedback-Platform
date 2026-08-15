@@ -17,4 +17,10 @@ public interface DailyMenuDishRepository extends JpaRepository<DailyMenuDish, Lo
 
     @Query("SELECT COUNT(DISTINCT dmd.dailyMenu.id) FROM DailyMenuDish dmd WHERE dmd.dish.id = :dishId")
     long countMenusContainingDish(@Param("dishId") Long dishId);
+
+    @Query("SELECT dmd.dish.id, COUNT(DISTINCT dmd.dailyMenu.id) FROM DailyMenuDish dmd WHERE dmd.dish.id IN :dishIds GROUP BY dmd.dish.id")
+    List<Object[]> countMenusForDishes(@Param("dishIds") List<Long> dishIds);
+
+    @Query("SELECT dmd.dish.id, MAX(dmd.dailyMenu.menuDate) FROM DailyMenuDish dmd WHERE dmd.dish.id IN :dishIds GROUP BY dmd.dish.id")
+    List<Object[]> findLastServedDatesForDishes(@Param("dishIds") List<Long> dishIds);
 }

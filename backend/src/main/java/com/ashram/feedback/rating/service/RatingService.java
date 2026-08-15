@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class RatingService {
      * Submit or update ratings for a menu.
      * Editable only until midnight of the menu date.
      */
+    @CacheEvict(value = "topDishes", allEntries = true)
     @Transactional
     public void submitRatings(Long residentId, Long menuId, SubmitRatingsRequest request) {
         DailyMenu menu = menuRepository.findById(menuId)

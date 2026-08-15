@@ -40,6 +40,12 @@ public interface OverallLunchRatingRepository extends JpaRepository<OverallLunch
     List<Object[]> getDailySatisfactionTrend(@Param("startDate") LocalDate startDate,
                                               @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT o.dailyMenu.menuDate, COUNT(o), AVG(o.rating) FROM OverallLunchRating o " +
+            "WHERE o.dailyMenu.menuDate BETWEEN :startDate AND :endDate " +
+            "GROUP BY o.dailyMenu.menuDate")
+    List<Object[]> getDailyOverallStatsBetween(@Param("startDate") LocalDate startDate,
+                                              @Param("endDate") LocalDate endDate);
+
     /** All overall ratings for a resident, ordered most recent first */
     @Query("SELECT o FROM OverallLunchRating o WHERE o.resident.id = :residentId " +
             "AND (:startDate IS NULL OR o.dailyMenu.menuDate >= :startDate) " +

@@ -7,7 +7,8 @@ export default function ResidentTopDishes() {
 
   const { data: topDishes, isLoading: loadingTopDishes } = useQuery({
     queryKey: ['topDishesResident'],
-    queryFn: () => api.get('/analytics/top-dishes?metric=TOP_RATED&limit=10').then(res => res.data.data ?? res.data)
+    queryFn: () => api.get('/analytics/top-dishes?metric=TOP_RATED&limit=10').then(res => res.data.data ?? res.data),
+    staleTime: 60 * 1000,
   });
 
   // Fetch Saved Recipes (Wishlist)

@@ -14,11 +14,13 @@ import com.ashram.feedback.rating.entity.DishRating;
 import com.ashram.feedback.rating.entity.OverallLunchRating;
 import com.ashram.feedback.rating.repository.DishRatingRepository;
 import com.ashram.feedback.rating.repository.OverallLunchRatingRepository;
+import com.ashram.feedback.resident.entity.Camp;
 import com.ashram.feedback.resident.entity.Resident;
 import com.ashram.feedback.resident.repository.CampRepository;
 import com.ashram.feedback.resident.repository.ResidentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -241,20 +243,38 @@ public class AnalyticsService {
         if (startDate == null) startDate = LocalDate.now().minusDays(14);
         if (endDate == null) endDate = LocalDate.now();
 
+        // 1. Batch fetch active camps overlapping the entire date range
+        List<Camp> activeCamps = campRepository.findActiveCampsOverlappingDateRange(startDate, endDate);
+
+        // 2. Batch fetch overall rating stats grouped by menuDate
+        List<Object[]> overallStatsRaw = overallRatingRepository.getDailyOverallStatsBetween(startDate, endDate);
+        Map<LocalDate, Object[]> overallStatsByDate = new HashMap<>();
+        for (Object[] row : overallStatsRaw) {
+            LocalDate date = (LocalDate) row[0];
+            overallStatsByDate.put(date, row);
+        }
+
+        // 3. Batch fetch dish rating averages grouped by menuDate
+        List<Object[]> dishStatsRaw = dishRatingRepository.getDailyAverageRatingBetween(startDate, endDate);
+        Map<LocalDate, Double> dishAvgByDate = new HashMap<>();
+        for (Object[] row : dishStatsRaw) {
+            LocalDate date = (LocalDate) row[0];
+            Double avg = row[1] != null ? ((Number) row[1]).doubleValue() : null;
+            dishAvgByDate.put(date, avg);
+        }
+
         List<DailyTrendDto> trends = new ArrayList<>();
 
         for (LocalDate d = startDate; !d.isAfter(endDate); d = d.plusDays(1)) {
-            long activeResidents = campRepository.countActiveCampsByDate(d);
-            Optional<DailyMenu> menuOpt = menuRepository.findByMenuDate(d);
-            long rated = 0;
-            Double avgOverall = null;
-            Double avgDish = dishRatingRepository.getAverageRatingByDate(d);
+            final LocalDate currentDay = d;
+            long activeResidents = activeCamps.stream()
+                    .filter(c -> !c.getStartDate().isAfter(currentDay) && !c.getEndDate().isBefore(currentDay))
+                    .count();
 
-            if (menuOpt.isPresent()) {
-                Long menuId = menuOpt.get().getId();
-                rated = overallRatingRepository.countByDailyMenuId(menuId);
-                avgOverall = overallRatingRepository.getAverageRatingByMenuId(menuId);
-            }
+            Object[] overallRow = overallStatsByDate.get(d);
+            long rated = overallRow != null && overallRow[1] != null ? ((Number) overallRow[1]).longValue() : 0L;
+            Double avgOverall = overallRow != null && overallRow[2] != null ? ((Number) overallRow[2]).doubleValue() : null;
+            Double avgDish = dishAvgByDate.get(d);
 
             long pending = Math.max(0, activeResidents - rated);
             Double completionPct = activeResidents > 0
@@ -338,6 +358,7 @@ public class AnalyticsService {
     /**
      * Top dishes by different metrics.
      */
+    @Cacheable(value = "topDishes", key = "#metric + '_' + #limit")
     @Transactional(readOnly = true)
     public List<TopDishDto> getTopDishes(String metric, int limit) {
         List<Object[]> results;
@@ -449,17 +470,53 @@ public class AnalyticsService {
      */
     @Transactional(readOnly = true)
     public List<DishComparisonDto> compareDishes(List<Long> dishIds) {
+        if (dishIds == null || dishIds.isEmpty()) return Collections.emptyList();
+
+        Map<Long, Dish> dishMap = dishRepository.findDishesWithImagesByIds(dishIds).stream()
+                .collect(Collectors.toMap(Dish::getId, d -> d));
+
+        Map<Long, Long> ratingCountMap = new HashMap<>();
+        Map<Long, Double> ratingAvgMap = new HashMap<>();
+        for (Object[] row : dishRatingRepository.findRatingStatsForDishes(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            Double avg = row[2] != null ? ((Number) row[2]).doubleValue() : null;
+            ratingCountMap.put(dishId, count);
+            ratingAvgMap.put(dishId, avg);
+        }
+
+        Map<Long, Long> servedMap = new HashMap<>();
+        for (Object[] row : menuDishRepository.countMenusForDishes(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            servedMap.put(dishId, count);
+        }
+
+        Map<Long, Long> savedMap = new HashMap<>();
+        for (Object[] row : cookLaterRepository.countSavedByDishIds(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            savedMap.put(dishId, count);
+        }
+
+        Map<Long, LocalDate> lastServedMap = new HashMap<>();
+        for (Object[] row : menuDishRepository.findLastServedDatesForDishes(dishIds)) {
+            Long dishId = (Long) row[0];
+            LocalDate date = (LocalDate) row[1];
+            lastServedMap.put(dishId, date);
+        }
+
         return dishIds.stream().map(dishId -> {
-            Dish dish = dishRepository.findById(dishId).orElse(null);
+            Dish dish = dishMap.get(dishId);
             if (dish == null) return null;
 
             String dishName = dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName();
             String cat = dish.getCategory() != null ? dish.getCategory().name() : null;
-            Double avgRating = dishRatingRepository.getAverageRatingByDishId(dishId);
-            long numRatings = dishRatingRepository.countByDishId(dishId);
-            long timesServed = menuDishRepository.countMenusContainingDish(dishId);
-            long saves = cookLaterRepository.countByDishId(dishId);
-            LocalDate lastServed = dishRatingRepository.findLastServedDate(dishId);
+            Double avgRating = ratingAvgMap.get(dishId);
+            long numRatings = ratingCountMap.getOrDefault(dishId, 0L);
+            long timesServed = servedMap.getOrDefault(dishId, 0L);
+            long saves = savedMap.getOrDefault(dishId, 0L);
+            LocalDate lastServed = lastServedMap.get(dishId);
 
             return DishComparisonDto.builder()
                     .dishId(dishId)
@@ -507,9 +564,46 @@ public class AnalyticsService {
     }
 
     private List<TopDishDto> buildTopDishList(List<Object[]> results, String valueType) {
+        if (results == null || results.isEmpty()) return Collections.emptyList();
+
         List<Long> dishIds = results.stream().map(r -> (Long) r[0]).collect(Collectors.toList());
-        Map<Long, Dish> dishMap = dishRepository.findAllById(dishIds).stream()
+        Map<Long, Dish> dishMap = dishRepository.findDishesWithImagesByIds(dishIds).stream()
                 .collect(Collectors.toMap(Dish::getId, d -> d));
+
+        // 1. Batch ratings stats (count and avg) in 1 query
+        Map<Long, Long> ratingCountMap = new HashMap<>();
+        Map<Long, Double> ratingAvgMap = new HashMap<>();
+        for (Object[] row : dishRatingRepository.findRatingStatsForDishes(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            Double avg = row[2] != null ? ((Number) row[2]).doubleValue() : null;
+            ratingCountMap.put(dishId, count);
+            ratingAvgMap.put(dishId, avg);
+        }
+
+        // 2. Batch served count in 1 query
+        Map<Long, Long> servedMap = new HashMap<>();
+        for (Object[] row : menuDishRepository.countMenusForDishes(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            servedMap.put(dishId, count);
+        }
+
+        // 3. Batch saved count in 1 query
+        Map<Long, Long> savedMap = new HashMap<>();
+        for (Object[] row : cookLaterRepository.countSavedByDishIds(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            savedMap.put(dishId, count);
+        }
+
+        // 4. Batch favourite count in 1 query
+        Map<Long, Long> favouriteMap = new HashMap<>();
+        for (Object[] row : favouriteRepository.countFavouritesByDishIds(dishIds)) {
+            Long dishId = (Long) row[0];
+            Long count = row[1] != null ? ((Number) row[1]).longValue() : 0L;
+            favouriteMap.put(dishId, count);
+        }
 
         return results.stream().map(row -> {
             Long dishId = (Long) row[0];
@@ -517,21 +611,25 @@ public class AnalyticsService {
             Dish dish = dishMap.get(dishId);
             if (dish == null) return null;
 
+            Double avgRating = ratingAvgMap.get(dishId);
+            Long ratingCount = ratingCountMap.getOrDefault(dishId, 0L);
+
             TopDishDto.TopDishDtoBuilder builder = TopDishDto.builder()
                     .dishId(dish.getId())
                     .dishName(dish.getDisplayName() != null ? dish.getDisplayName() : dish.getName())
                     .imageUrl(dish.getPrimaryImageUrl());
+
             if ("avg".equals(valueType)) {
                 builder.averageRating(round(value.doubleValue()));
-                builder.ratingCount(dishRatingRepository.countByDishId(dishId));
+                builder.ratingCount(ratingCount);
             } else {
                 builder.ratingCount(value.longValue());
-                Double avg = dishRatingRepository.getAverageRatingByDishId(dishId);
-                if (avg != null) builder.averageRating(round(avg));
+                if (avgRating != null) builder.averageRating(round(avgRating));
             }
-            builder.servedCount(menuDishRepository.countMenusContainingDish(dishId));
-            builder.savedCount(cookLaterRepository.countByDishId(dishId));
-            builder.favouriteCount(favouriteRepository.countByDishId(dishId));
+
+            builder.servedCount(servedMap.getOrDefault(dishId, 0L));
+            builder.savedCount(savedMap.getOrDefault(dishId, 0L));
+            builder.favouriteCount(favouriteMap.getOrDefault(dishId, 0L));
             return builder.build();
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }

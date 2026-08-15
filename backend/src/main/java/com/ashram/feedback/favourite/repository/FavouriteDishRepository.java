@@ -11,7 +11,8 @@ import com.ashram.feedback.favourite.entity.FavouriteDish;
 @Repository
 public interface FavouriteDishRepository extends JpaRepository<FavouriteDish, Long> {
 
-    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = {"dish", "dish.images", "dish.recipe", "dish.nutrition"})
+    @org.springframework.data.jpa.repository.EntityGraph(attributePaths = { "dish", "dish.images", "dish.recipe",
+            "dish.nutrition" })
     List<FavouriteDish> findByResidentIdOrderByCreatedAtDesc(Long residentId);
 
     boolean existsByResidentIdAndDishId(Long residentId, Long dishId);
@@ -25,4 +26,8 @@ public interface FavouriteDishRepository extends JpaRepository<FavouriteDish, Lo
     @Query("SELECT fd.dish.id, COUNT(fd) as favCount FROM FavouriteDish fd " +
             "GROUP BY fd.dish.id ORDER BY favCount DESC")
     List<Object[]> findMostFavouritedDishes();
+
+    @Query("SELECT fd.dish.id, COUNT(fd) FROM FavouriteDish fd WHERE fd.dish.id IN :dishIds GROUP BY fd.dish.id")
+    List<Object[]> countFavouritesByDishIds(
+            @org.springframework.data.repository.query.Param("dishIds") List<Long> dishIds);
 }

@@ -20,6 +20,10 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     @EntityGraph(attributePaths = {"images", "recipe", "nutrition", "allergen"})
     Optional<Dish> findById(Long id);
 
+    @EntityGraph(attributePaths = {"images"})
+    @Query("SELECT d FROM Dish d WHERE d.id IN :dishIds")
+    List<Dish> findDishesWithImagesByIds(@Param("dishIds") List<Long> dishIds);
+
     Optional<Dish> findBySlug(String slug);
 
     boolean existsBySlug(String slug);

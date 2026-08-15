@@ -5,7 +5,8 @@ import { Trophy, Star, Utensils } from 'lucide-react';
 export default function AdminTopDishes() {
   const { data: topDishes, isLoading } = useQuery({
     queryKey: ['topDishesAdmin'],
-    queryFn: () => api.get('/analytics/top-dishes?metric=TOP_RATED&limit=10').then(res => res.data.data ?? res.data)
+    queryFn: () => api.get('/analytics/top-dishes?metric=TOP_RATED&limit=10').then(res => res.data.data ?? res.data),
+    staleTime: 60 * 1000,
   });
 
   if (isLoading) {
