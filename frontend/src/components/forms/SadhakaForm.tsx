@@ -20,7 +20,7 @@ export default function SadhakaForm({ initialData, onSuccess, onCancel }: Sadhak
   });
 
   const mutation = useMutation({
-    mutationFn: (data: typeof formData) => {
+    mutationFn: async (data: typeof formData): Promise<any> => {
       if (initialData) {
         // Exclude residentCode from update request since it's permanent
         return api.put(`/residents/${initialData.id}`, {
