@@ -1,21 +1,32 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ThemeToggle from '../components/ThemeToggle';
-import { Home, LogOut, Utensils, Trophy } from 'lucide-react';
+import { Home, LogOut, Utensils, Trophy, Info } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import api from '../api/axios';
 import OnboardingFeedbackModal from '../components/resident/OnboardingFeedbackModal';
+import { getDocsHasNew } from '../pages/resident/ImportantDocs';
 
 export default function ResidentLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
 
+  // Fetch visible docs for the red dot indicator
+  const { data: visibleDocs = [] } = useQuery({
+    queryKey: ['importantDocsVisible'],
+    queryFn: () => api.get('/docs/visible').then((res: any) => res.data?.content || res.data || (Array.isArray(res) ? res : [])),
+    staleTime: 5 * 60 * 1000, // 5 min cache
+  });
+
+  const docsHasNew = getDocsHasNew(visibleDocs);
+
   const navItems = [
-    { name: 'Today', path: '/resident', icon: Home },
-    // { name: 'Favourites', path: '/resident/favourites', icon: Star },
-    { name: 'Top Dishes', path: '/resident/top-dishes', icon: Trophy },
-    { name: 'Saved', path: '/resident/saved', icon: Utensils },
+    { name: 'Today', path: '/resident', icon: Home, hasNew: false },
+    // { name: 'Favourites', path: '/resident/favourites', icon: Star, hasNew: false },
+    { name: 'Top Dishes', path: '/resident/top-dishes', icon: Trophy, hasNew: false },
+    { name: 'Saved', path: '/resident/saved', icon: Utensils, hasNew: false },
+    { name: 'Info', path: '/resident/docs', icon: Info, hasNew: docsHasNew },
   ];
 
   const { data: feedbackCheck } = useQuery({
@@ -66,9 +77,18 @@ export default function ResidentLayout() {
                 to={item.path}
                 className="relative flex flex-col sm:flex-row items-center justify-center sm:px-6 py-2 sm:py-4 flex-1 sm:flex-none text-slate-500 dark:text-slate-400 dark:text-slate-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
-                <Icon className={`w-6 h-6 sm:w-5 sm:h-5 sm:mr-2 ${isActive ? 'text-primary-600 dark:text-primary-400' : ''}`} />
+                {/* Icon with optional red dot */}
+                <span className="relative sm:mr-2">
+                  <Icon className={`w-6 h-6 sm:w-5 sm:h-5 ${isActive ? 'text-primary-600 dark:text-primary-400' : ''}`} />
+                  {item.hasNew && !isActive && (
+                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+                  )}
+                </span>
                 <span className={`text-[10px] sm:text-sm font-medium mt-1 sm:mt-0 ${isActive ? 'text-primary-700 dark:text-primary-400' : ''}`}>
                   {item.name}
+                  {item.hasNew && !isActive && (
+                    <span className="sm:hidden ml-0.5 inline-block w-1.5 h-1.5 bg-red-500 rounded-full align-middle mb-0.5" />
+                  )}
                 </span>
 
                 {/* Active Indicator Line */}

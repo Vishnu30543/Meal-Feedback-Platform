@@ -55,6 +55,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/health-tips/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/health-tips/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/health-tips/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/docs/visible").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/docs", "/api/docs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/docs", "/api/docs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/docs", "/api/docs/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/docs", "/api/docs/**").hasRole("ADMIN")
 
                         // Authenticated endpoints (both roles)
                         .anyRequest().authenticated()

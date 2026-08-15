@@ -18,6 +18,7 @@ const AdminDishForm = lazy(() => import('./pages/admin/DishForm'));
 const AdminMenus = lazy(() => import('./pages/admin/Menus'));
 const AdminAnnouncements = lazy(() => import('./pages/admin/Announcements'));
 const AdminSettings = lazy(() => import('./pages/admin/Settings'));
+const AdminImportantDocs = lazy(() => import('./pages/admin/ImportantDocs'));
 
 // Admin Analytics pages
 const DishAnalytics = lazy(() => import('./pages/admin/DishAnalytics'));
@@ -34,6 +35,7 @@ const ResidentTodayMenu = lazy(() => import('./pages/resident/TodayMenu'));
 const ResidentFavourites = lazy(() => import('./pages/resident/Favourites'));
 const ResidentSavedRecipes = lazy(() => import('./pages/resident/SavedRecipes'));
 const ResidentTopDishes = lazy(() => import('./pages/resident/TopDishes'));
+const ResidentImportantDocs = lazy(() => import('./pages/resident/ImportantDocs'));
 
 // Loading fallback
 const PageLoader = () => (
@@ -73,6 +75,7 @@ function App() {
           <Route path="dishes/:id" element={<AdminDishForm />} />
           <Route path="menus" element={<AdminMenus />} />
           <Route path="announcements" element={<AdminAnnouncements />} />
+          <Route path="docs" element={<AdminImportantDocs />} />
           <Route path="settings" element={<AdminSettings />} />
 
           {/* Analytics Routes */}
@@ -95,6 +98,7 @@ function App() {
           <Route path="favourites" element={<ResidentFavourites />} />
           <Route path="saved" element={<ResidentSavedRecipes />} />
           <Route path="top-dishes" element={<ResidentTopDishes />} />
+          <Route path="docs" element={<ResidentImportantDocs />} />
         </Route>
 
         {/* Default Redirect */}

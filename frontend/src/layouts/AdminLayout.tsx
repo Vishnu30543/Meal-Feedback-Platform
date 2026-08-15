@@ -5,7 +5,7 @@ import ThemeToggle from '../components/ThemeToggle';
 import {
   LayoutDashboard, LogOut, FileText, Bell, Users, Settings,
   Utensils, Menu, X, BarChart2, ChevronDown, ChevronRight,
-  TrendingUp, MessageSquare
+  TrendingUp, MessageSquare, Info
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -23,6 +23,7 @@ export default function AdminLayout() {
     { name: 'Sadhakas', path: '/admin/residents', icon: Users },
     { name: 'Top Dishes', path: '/admin/top-dishes', icon: TrendingUp },
     { name: 'Content', path: '/admin/announcements', icon: Bell },
+    { name: 'Ashram Info', path: '/admin/docs', icon: Info },
     { name: 'Settings', path: '/admin/settings', icon: Settings },
   ];
 
