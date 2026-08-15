@@ -27,11 +27,11 @@ export default function AdminLayout() {
   ];
 
   const analyticsItems = [
-    { name: 'Dashboard', path: '/admin/analytics', icon: BarChart2, exact: true },
+    // { name: 'Dashboard', path: '/admin/analytics', icon: BarChart2, exact: true },
     { name: 'Today\'s Feedback', path: '/admin/analytics/today-feedback', icon: MessageSquare },
-    { name: 'Dish Analytics', path: '/admin/analytics/dishes', icon: TrendingUp },
-    { name: 'Dish Comparison', path: '/admin/analytics/comparison', icon: GitCompare },
-    { name: 'Comment Search', path: '/admin/analytics/search', icon: MessageSquare },
+    // { name: 'Dish Analytics', path: '/admin/analytics/dishes', icon: TrendingUp },
+    // { name: 'Dish Comparison', path: '/admin/analytics/comparison', icon: GitCompare },
+    // { name: 'Comment Search', path: '/admin/analytics/search', icon: MessageSquare },
     { name: 'Onboarding Feedback', path: '/admin/analytics/onboarding', icon: Users },
   ];
 

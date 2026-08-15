@@ -4,18 +4,21 @@ import api from '../../api/axios';
 import { format } from 'date-fns';
 
 interface AnnouncementFormProps {
+  type: 'announcements' | 'healthTips';
   initialData?: any;
   onSuccess: () => void;
   onCancel: () => void;
 }
 
-export default function AnnouncementForm({ initialData, onSuccess, onCancel }: AnnouncementFormProps) {
+export default function AnnouncementForm({ type, initialData, onSuccess, onCancel }: AnnouncementFormProps) {
   const queryClient = useQueryClient();
+  
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
     startDate: initialData?.startDate || format(new Date(), 'yyyy-MM-dd'),
     endDate: initialData?.endDate || format(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), 'yyyy-MM-dd'),
+    activeDate: initialData?.activeDate || format(new Date(), 'yyyy-MM-dd'),
     priority: initialData?.priority || 1,
     visible: initialData?.visible ?? true,
     imageUrl: initialData?.imageUrl || ''
@@ -23,13 +26,37 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
 
   const mutation = useMutation({
     mutationFn: (data: typeof formData) => {
-      if (initialData) {
-        return api.put(`/announcements/${initialData.id}`, data);
+      const endpoint = type === 'announcements' ? '/announcements' : '/health-tips';
+      
+      // Filter payload based on type
+      const payload: any = {
+        title: data.title,
+        description: data.description,
+        priority: data.priority,
+        visible: data.visible,
+        imageUrl: data.imageUrl
+      };
+      
+      if (type === 'announcements') {
+        payload.startDate = data.startDate;
+        payload.endDate = data.endDate;
+      } else {
+        payload.activeDate = data.activeDate;
       }
-      return api.post('/announcements', data);
+
+      if (initialData) {
+        return api.put(`${endpoint}/${initialData.id}`, payload);
+      }
+      return api.post(endpoint, payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['announcements'] });
+      if (type === 'announcements') {
+        queryClient.invalidateQueries({ queryKey: ['announcements'] });
+        queryClient.invalidateQueries({ queryKey: ['activeAnnouncements'] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['healthTipsAll'] });
+        queryClient.invalidateQueries({ queryKey: ['healthTips'] });
+      }
       onSuccess();
     },
   });
@@ -49,7 +76,7 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
           className="input-field"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          placeholder="Announcement title"
+          placeholder={type === 'announcements' ? "Announcement title" : "Health tip title"}
         />
       </div>
       
@@ -63,28 +90,41 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      {type === 'announcements' ? (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="label-text">Start Date <span className="text-red-500">*</span></label>
+            <input
+              type="date"
+              required
+              className="input-field"
+              value={formData.startDate}
+              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+            />
+          </div>
+          <div>
+            <label className="label-text">End Date <span className="text-red-500">*</span></label>
+            <input
+              type="date"
+              required
+              className="input-field"
+              value={formData.endDate}
+              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+            />
+          </div>
+        </div>
+      ) : (
         <div>
-          <label className="label-text">Start Date <span className="text-red-500">*</span></label>
+          <label className="label-text">Active Date <span className="text-red-500">*</span></label>
           <input
             type="date"
             required
             className="input-field"
-            value={formData.startDate}
-            onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+            value={formData.activeDate}
+            onChange={(e) => setFormData({ ...formData, activeDate: e.target.value })}
           />
         </div>
-        <div>
-          <label className="label-text">End Date <span className="text-red-500">*</span></label>
-          <input
-            type="date"
-            required
-            className="input-field"
-            value={formData.endDate}
-            onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-          />
-        </div>
-      </div>
+      )}
 
       <div>
         <label className="label-text">Image URL (Optional)</label>
@@ -112,7 +152,7 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
 
       {mutation.isError && (
         <div className="text-red-500 text-sm p-2 bg-red-50 dark:bg-red-900/20 rounded">
-          Failed to create announcement. {mutation.error?.message}
+          Failed to save {type === 'announcements' ? 'announcement' : 'health tip'}. {mutation.error?.message}
         </div>
       )}
 
@@ -130,7 +170,7 @@ export default function AnnouncementForm({ initialData, onSuccess, onCancel }: A
           className="btn-primary"
           disabled={mutation.isPending}
         >
-          {mutation.isPending ? 'Saving...' : (initialData ? 'Update Announcement' : 'Publish Announcement')}
+          {mutation.isPending ? 'Saving...' : (initialData ? 'Update' : 'Publish')}
         </button>
       </div>
     </form>

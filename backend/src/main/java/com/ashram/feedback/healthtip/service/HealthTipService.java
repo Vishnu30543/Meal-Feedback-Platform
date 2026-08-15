@@ -25,6 +25,11 @@ public class HealthTipService {
     }
 
     @Transactional(readOnly = true)
+    public List<HealthTipDto> getTipsByDate(LocalDate date) {
+        return repository.findTodaysTips(date).stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public PagedResponse<HealthTipDto> getAll(int page, int size) {
         Page<HealthTip> p = repository.findAllByOrderByCreatedAtDesc(PageRequest.of(page, size));
         return PagedResponse.of(p.getContent().stream().map(this::toDto).collect(Collectors.toList()),

@@ -13,16 +13,24 @@ export default function Announcements() {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (id: number) => api.delete(`/announcements/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['announcements'] });
-      queryClient.invalidateQueries({ queryKey: ['healthTipsAll'] });
+    mutationFn: ({ id, type }: { id: number, type: 'announcements' | 'healthTips' }) => {
+      const endpoint = type === 'announcements' ? '/announcements' : '/health-tips';
+      return api.delete(`${endpoint}/${id}`);
+    },
+    onSuccess: (_, variables) => {
+      if (variables.type === 'announcements') {
+        queryClient.invalidateQueries({ queryKey: ['announcements'] });
+        queryClient.invalidateQueries({ queryKey: ['activeAnnouncements'] });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['healthTipsAll'] });
+        queryClient.invalidateQueries({ queryKey: ['healthTips'] });
+      }
     }
   });
 
-  const handleDelete = (id: number, title: string) => {
+  const handleDelete = (id: number, title: string, type: 'announcements' | 'healthTips') => {
     if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate({ id, type });
     }
   };
 
@@ -125,7 +133,7 @@ export default function Announcements() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => handleDelete(item.id, item.title)}
+                        onClick={() => handleDelete(item.id, item.title, 'announcements')}
                         disabled={deleteMutation.isPending}
                         className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600"
                       >
@@ -158,7 +166,7 @@ export default function Announcements() {
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
-                        onClick={() => handleDelete(item.id, item.title)}
+                        onClick={() => handleDelete(item.id, item.title, 'healthTips')}
                         disabled={deleteMutation.isPending}
                         className="p-1.5 text-slate-400 dark:text-slate-500 hover:text-red-600"
                       >
@@ -179,6 +187,7 @@ export default function Announcements() {
         title={selectedAnnouncement ? "Edit Entry" : (activeTab === 'announcements' ? "Create New Announcement" : "Create New Health Tip")}
       >
         <AnnouncementForm 
+          type={activeTab}
           initialData={selectedAnnouncement}
           onSuccess={() => setIsAddModalOpen(false)}
           onCancel={() => setIsAddModalOpen(false)}

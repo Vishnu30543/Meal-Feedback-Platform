@@ -13,6 +13,8 @@ export default function ResidentDashboard() {
   const [selectedDish, setSelectedDish] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const todayStr = format(new Date(), 'yyyy-MM-dd');
+
   // Fetch Progress
   const { data: progress } = useQuery({
     queryKey: ['ratingProgress'],
@@ -27,8 +29,8 @@ export default function ResidentDashboard() {
 
   // Fetch Health Tips
   const { data: tips } = useQuery({
-    queryKey: ['healthTips'],
-    queryFn: () => api.get('/health-tips/today').then(res => res.data)
+    queryKey: ['healthTips', todayStr],
+    queryFn: () => api.get(`/health-tips/date/${todayStr}`).then(res => res.data)
   });
 
   // Fetch Active Announcements
@@ -38,7 +40,6 @@ export default function ResidentDashboard() {
   });
 
   // Fetch Today's Menu
-  const todayStr = format(new Date(), 'yyyy-MM-dd');
   const { data: menu, isLoading: loadingMenu } = useQuery({
     queryKey: ['menu', todayStr],
     queryFn: () => api.get(`/menus/date/${todayStr}`).then(res => res.data)

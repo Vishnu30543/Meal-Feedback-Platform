@@ -13,7 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 @RestController @RequestMapping("/api/health-tips") @RequiredArgsConstructor
 @Tag(name = "Health Tips", description = "Health tip management endpoints")
 public class HealthTipController {
@@ -24,6 +25,13 @@ public class HealthTipController {
     @Operation(summary = "Get today's health tips")
     public ResponseEntity<ApiResponse<List<HealthTipDto>>> getTodays() {
         return ResponseEntity.ok(ApiResponse.success(service.getTodaysTips()));
+    }
+
+    @GetMapping("/date/{date}")
+    @Operation(summary = "Get health tips for a specific date")
+    public ResponseEntity<ApiResponse<List<HealthTipDto>>> getByDate(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(ApiResponse.success(service.getTipsByDate(date)));
     }
 
     @GetMapping @PreAuthorize("hasRole('ADMIN')")

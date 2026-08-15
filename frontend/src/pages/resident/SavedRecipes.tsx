@@ -46,8 +46,9 @@ export default function SavedRecipes() {
   };
 
   useEffect(() => {
+    const timeouts = timeoutsRef.current;
     return () => {
-      Object.values(timeoutsRef.current).forEach(clearTimeout);
+      Object.values(timeouts).forEach(clearTimeout);
     };
   }, []);
 

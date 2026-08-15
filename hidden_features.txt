@@ -1,0 +1,10 @@
+Hidden UI Elements Log
+
+1. Sadhaka Page (Resident):
+- Favourites page link/icon hidden from navigation.
+
+2. Admin Page (Inside Analytics Folder/Dropdown):
+- Dashboard hidden.
+- Dish Analytics hidden.
+- Dish Comparison hidden.
+- Comment Search hidden.

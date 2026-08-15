@@ -13,7 +13,7 @@ export default function ResidentLayout() {
 
   const navItems = [
     { name: 'Today', path: '/resident', icon: Home },
-    { name: 'Favourites', path: '/resident/favourites', icon: Star },
+    // { name: 'Favourites', path: '/resident/favourites', icon: Star },
     { name: 'Top Dishes', path: '/resident/top-dishes', icon: Trophy },
     { name: 'Saved', path: '/resident/saved', icon: Utensils },
   ];
