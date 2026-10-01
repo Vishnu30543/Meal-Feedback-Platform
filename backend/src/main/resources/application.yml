@@ -10,13 +10,11 @@ spring:
     username: ${DB_USER:neondb_owner}
     password: ${DB_PASSWORD:npg_f8EacvDOnb9P}
     hikari:
-      maximum-pool-size: ${DB_POOL_MAX:10}
-      minimum-idle: ${DB_POOL_MIN:2}
-      connection-timeout: 30000
-      idle-timeout: 600000
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      minimum-idle: 0
+      idle-timeout: 120000
       max-lifetime: 1800000
-      keepalive-time: 60000
-      connection-test-query: SELECT 1
+      connection-timeout: 30000
 
   jpa:
     hibernate:
